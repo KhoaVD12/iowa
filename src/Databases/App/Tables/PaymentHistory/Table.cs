@@ -12,8 +12,8 @@
         public decimal? DiscountedPrice { get; set; }
         public string Currency { get; set; } = string.Empty;
         public DateTime PaymentDate { get; set; }
-        public DateTime CreateDate { get; set; }
-        public DateTime? LastUpdate { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime? LastUpdated { get; set; }
         public Guid CreateById { get; set; }
         public Guid? UpdateById { get; set; }
     }
