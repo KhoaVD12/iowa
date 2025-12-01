@@ -20,4 +20,4 @@ public class Parameters
     public Guid? CreatedById { get; set; }
     public Guid? UpdatedById { get; set; }
 }
-}
+
