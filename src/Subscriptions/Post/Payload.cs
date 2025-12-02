@@ -1,11 +1,7 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿namespace Iowa.Subscriptions.Post;
 
-namespace Iowa.Databases.App.Tables.Subcription;
-
-public class Table
+public class Payload
 {
-    public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public Guid ProviderId { get; set; }
     public Guid PackageId { get; set; }
@@ -15,9 +11,4 @@ public class Table
     public string ChartColor { get; set; } = string.Empty;
     public Guid? DiscountId { get; set; }
     public DateTime RenewalDate { get; set; }
-    public string? Status { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public Guid CreatedById { get; set; }
-    public DateTime? LastUpdated { get; set; }
-    public Guid? UpdatedById { get; set; }
 }
