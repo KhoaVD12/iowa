@@ -1,13 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Iowa.Databases.App;
+using Microsoft.EntityFrameworkCore;
 
-namespace Iowa.Databases;
-
-public static class Extensions
+namespace Iowa.Databases
 {
-    public static IServiceCollection AddDatabases(this IServiceCollection services, IConfiguration configuration)
+    public static class Extensions
     {
-        services.AddDbContext<App.IowaContext>(options =>
-            options.UseSqlServer("Server=localhost;Database=Iowa;Trusted_Connection=True;TrustServerCertificate=True"));
-        return services;
+        public static IServiceCollection AddDatabases(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddDbContext<IowaContext>(options =>
+                options.UseSqlServer("Server=localhost;Database=Iowa;Trusted_Connection=True;TrustServerCertificate=True"));
+            return services;
+        }
     }
 }
