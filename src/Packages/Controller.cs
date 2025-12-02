@@ -1,6 +1,5 @@
 ﻿using Iowa.Databases.App;
 using Iowa.Databases.App.Tables.Package;
-using Iowa.Models.PaginationResults;
 using Iowa.Packages.Post;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,16 +33,6 @@ public class Controller : ControllerBase
 
         var query = _context.Packages.AsQueryable();
         var all = query;
-
-        //if (!string.IsNullOrEmpty(parameters.Ids))
-        //{
-        //    var ids = parameters.Ids.Split(',', StringSplitOptions.RemoveEmptyEntries)
-        //    .Select(id => Guid.TryParse(id.Trim(), out var guid) ? guid : (Guid?)null)
-        //    .Where(guid => guid.HasValue)
-        //    .Select(guid => guid.Value)
-        //    .ToList();
-        //    query = query.Where(x => ids.Contains(x.Id));
-        //}
 
         if (parameters.ProviderId.HasValue)
             query = query.Where(x => x.ProviderId == parameters.ProviderId);
@@ -93,15 +82,8 @@ public class Controller : ControllerBase
 
         var result = await query.AsNoTracking().ToListAsync();
 
-        var paginationResults = new Builder<Databases.App.Tables.Package.Table>()
-          .WithAll(await all.CountAsync())
-          .WithIndex(parameters.PageIndex)
-          .WithSize(parameters.PageSize)
-          .WithTotal(result.Count)
-          .WithItems(result)
-          .Build();
         //không có bắn message
-        return Ok(paginationResults);
+        return Ok(result);
     }
 
     [HttpPost]

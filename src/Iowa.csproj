@@ -18,8 +18,4 @@
 		<PackageReference Include="WolverineFx.EntityFrameworkCore" Version="5.4.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Databases\App\Migrations\" />
-	</ItemGroup>
-
 </Project>
