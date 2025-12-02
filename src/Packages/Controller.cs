@@ -1,6 +1,5 @@
 ﻿using Iowa.Databases.App;
 using Iowa.Databases.App.Tables.Package;
-using Iowa.Models.PaginationResults;
 using Iowa.Packages.Post;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -93,15 +92,8 @@ public class Controller : ControllerBase
 
         var result = await query.AsNoTracking().ToListAsync();
 
-        var paginationResults = new Builder<Databases.App.Tables.Package.Table>()
-          .WithAll(await all.CountAsync())
-          .WithIndex(parameters.PageIndex)
-          .WithSize(parameters.PageSize)
-          .WithTotal(result.Count)
-          .WithItems(result)
-          .Build();
         //không có bắn message
-        return Ok(paginationResults);
+        return Ok(result);
     }
 
     [HttpPost]
