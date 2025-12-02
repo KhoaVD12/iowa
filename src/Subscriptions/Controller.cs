@@ -59,6 +59,12 @@ public class Controller : ControllerBase
     {
         var table = new Databases.App.Tables.Subcription.Table
         { };
+        var existingPackage = await _context.Packages.FindAsync(payload.PackageId);
+
+        if (existingPackage is null)
+        {
+            return NotFound($"Package with Id: {payload.PackageId} not found");
+        }
 
         table.Id = Guid.NewGuid();
         table.UserId = payload.UserId;
@@ -82,25 +88,31 @@ public class Controller : ControllerBase
     [HttpPut]
     public async Task<IActionResult> Put([FromBody] Subscriptions.Put.Payload payload)
     {
-        var table = _context.Subcriptions.FirstOrDefault(x => x.Id == payload.Id);
-        if (table == null)
+        var existSubscription = _context.Subcriptions.FirstOrDefault(x => x.Id == payload.Id);
+        if (existSubscription == null)
         {
             return NotFound();
         }
+        var existingPackage = await _context.Packages.FindAsync(payload.PackageId);
 
-        table.UserId = payload.UserId;
-        table.ProviderId = payload.ProviderId;
-        table.PackageId = payload.PackageId;
-        table.Price =  payload.Price;
-        table.DiscountedPrice = payload.DiscountedPrice;
-        table.Currency = payload.Currency;
-        table.ChartColor = payload.ChartColor;
-        table.DiscountId = payload.DiscountId;
-        table.RenewalDate = payload.RenewalDate;
-        table.LastUpdated = DateTime.UtcNow;
-        table.UpdatedById = payload.UserId;
+        if (existingPackage is null)
+        {
+            return NotFound($"Package with Id: {payload.PackageId} not found");
+        }
 
-        _context.Subcriptions.Update(table);
+        existSubscription.UserId = payload.UserId;
+        existSubscription.ProviderId = payload.ProviderId;
+        existSubscription.PackageId = payload.PackageId;
+        existSubscription.Price =  payload.Price;
+        existSubscription.DiscountedPrice = payload.DiscountedPrice;
+        existSubscription.Currency = payload.Currency;
+        existSubscription.ChartColor = payload.ChartColor;
+        existSubscription.DiscountId = payload.DiscountId;
+        existSubscription.RenewalDate = payload.RenewalDate;
+        existSubscription.LastUpdated = DateTime.UtcNow;
+        existSubscription.UpdatedById = payload.UserId;
+
+        _context.Subcriptions.Update(existSubscription);
         await _context.SaveChangesAsync();
         return NoContent();
     }
