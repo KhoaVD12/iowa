@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Iowa.Packages.Update;
+namespace Iowa.Packages.Put;
 
 public class Payload
 {

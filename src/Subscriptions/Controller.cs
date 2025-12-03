@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Wolverine;
 
-namespace Iowa.Subcriptions;
+namespace Iowa.Subscriptions;
 
 [Route("api/subscriptions")]
 [ApiController]
@@ -17,7 +17,7 @@ public class Controller : ControllerBase
         _messageBus = messageBus;
     }
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] Subscriptions.Get.Parameters parameters)
+    public async Task<IActionResult> Get([FromQuery] Get.Parameters parameters)
     {
         var query = _context.Subcriptions.AsQueryable();
 
@@ -55,7 +55,7 @@ public class Controller : ControllerBase
         return Ok(subscriptions);
     }
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] Subscriptions.Post.Payload payload)
+    public async Task<IActionResult> Post([FromBody] Post.Payload payload)
     {
         var table = new Databases.App.Tables.Subcription.Table
         { };
@@ -82,11 +82,11 @@ public class Controller : ControllerBase
 
         _context.Subcriptions.Add(table);
         await _context.SaveChangesAsync();
-        await _messageBus.PublishAsync(new Subscriptions.Post.Messager.Message(table.Id));
+        await _messageBus.PublishAsync(new Post.Messager.Message(table.Id));
         return CreatedAtAction(nameof(Post), new { id = table.Id });
     }
     [HttpPut]
-    public async Task<IActionResult> Put([FromBody] Subscriptions.Put.Payload payload)
+    public async Task<IActionResult> Put([FromBody] Put.Payload payload)
     {
         var existSubscription = _context.Subcriptions.FirstOrDefault(x => x.Id == payload.Id);
         if (existSubscription == null)
@@ -117,7 +117,7 @@ public class Controller : ControllerBase
         return NoContent();
     }
     [HttpDelete]
-    public async Task<IActionResult> Delete([FromQuery] Subscriptions.Delete.Parameters parameters)
+    public async Task<IActionResult> Delete([FromQuery] Delete.Parameters parameters)
     {
         var table = _context.Subcriptions.FirstOrDefault(x => x.Id == parameters.Id);
         if (table == null)
