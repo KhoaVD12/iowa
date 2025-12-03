@@ -2,6 +2,7 @@
 
 public class Parameters
 {
+    public Guid? Id { get; set; }
     public Guid? ProviderId { get; set; }
     public string? Name { get; set; }
     public string? Description { get; set; }

@@ -24,5 +24,6 @@ app.MapControllers();
 
 app.MapHub<Iowa.Subscriptions.Hub>("subscriptions-hub");
 app.MapHub<Iowa.Packages.Hub>("packages-hub");
+app.MapHub<Iowa.Providers.Hub>("providers-hub");
 
 app.Run();

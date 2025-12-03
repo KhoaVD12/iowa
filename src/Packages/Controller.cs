@@ -1,6 +1,6 @@
 ﻿using Iowa.Databases.App;
 using Iowa.Databases.App.Tables.Package;
-using Iowa.Packages.Post;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -32,7 +32,9 @@ public class Controller : ControllerBase
     {
 
         var query = _context.Packages.AsQueryable();
-        var all = query;
+
+        if (parameters.Id.HasValue)
+            query = query.Where(x => x.Id == parameters.Id);
 
         if (parameters.ProviderId.HasValue)
             query = query.Where(x => x.ProviderId == parameters.ProviderId);
@@ -64,42 +66,42 @@ public class Controller : ControllerBase
         if (parameters.UpdatedById.HasValue)
             query = query.Where(x => x.UpdatedById == parameters.UpdatedById);
 
-        if (!string.IsNullOrEmpty(parameters.SortBy))
-        {
-            var sortBy = typeof(Databases.App.Tables.Package.Table)
-                .GetProperties()
-                .FirstOrDefault(p => p.Name.Equals(parameters.SortBy, StringComparison.OrdinalIgnoreCase))
-                ?.Name;
-            if (sortBy != null)
-            {
-                query = parameters.SortOrder?.ToLower() == "desc"
-                    ? query.OrderByDescending(x => EF.Property<object>(x, sortBy))
-                    : query.OrderBy(x => EF.Property<object>(x, sortBy));
-            }
-        }
-        if (parameters.PageSize.HasValue && parameters.PageIndex.HasValue && parameters.PageSize > 0 && parameters.PageIndex.Value >= 0)
-            query = query.Skip(parameters.PageSize.Value * parameters.PageIndex.Value).Take(parameters.PageSize.Value);
+        //if (!string.IsNullOrEmpty(parameters.SortBy))
+        //{
+        //    var sortBy = typeof(Databases.App.Tables.Package.Table)
+        //        .GetProperties()
+        //        .FirstOrDefault(p => p.Name.Equals(parameters.SortBy, StringComparison.OrdinalIgnoreCase))
+        //        ?.Name;
+        //    if (sortBy != null)
+        //    {
+        //        query = parameters.SortOrder?.ToLower() == "desc"
+        //            ? query.OrderByDescending(x => EF.Property<object>(x, sortBy))
+        //            : query.OrderBy(x => EF.Property<object>(x, sortBy));
+        //    }
+        //}
+        //if (parameters.PageSize.HasValue && parameters.PageIndex.HasValue && parameters.PageSize > 0 && parameters.PageIndex.Value >= 0)
+        //    query = query.Skip(parameters.PageSize.Value * parameters.PageIndex.Value).Take(parameters.PageSize.Value);
 
-        var result = await query.AsNoTracking().ToListAsync();
+        var packages = await query.AsNoTracking().ToListAsync();
 
         //không có bắn message
-        return Ok(result);
+        return Ok(packages);
     }
 
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] Post.Payload payload)
     {
-        //var existingProvider = await _context.Providers.FindAsync(payload.ProviderId);
-        //if (existingProvider == null)
-        //{
-        //    return NotFound(new ProblemDetails
-        //    {
-        //        Title = "Provider not found",
-        //        Detail = $"Provider with ID {payload.ProviderId} does not exist.",
-        //        Status = StatusCodes.Status404NotFound,
-        //        Instance = HttpContext.Request.Path
-        //    });
-        //}
+        var existingProvider = await _context.Providers.FindAsync(payload.ProviderId);
+        if (existingProvider == null)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Title = "Provider not found",
+                Detail = $"Provider with ID {payload.ProviderId} does not exist.",
+                Status = StatusCodes.Status404NotFound,
+                Instance = HttpContext.Request.Path
+            });
+        }
         var package = new Table
         {
             Id = Guid.NewGuid(),
@@ -122,7 +124,7 @@ public class Controller : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> Put([FromBody] Update.Payload payload)
+    public async Task<IActionResult> Put([FromBody] Put.Payload payload)
     {
         var package = await _context.Packages.FindAsync(payload.Id);
         if (package == null)
@@ -135,17 +137,19 @@ public class Controller : ControllerBase
                 Instance = HttpContext.Request.Path
             });
         }
-        //var existingProvider = await _context.Providers.FindAsync(payload.ProviderId);
-        //if (existingProvider == null)
-        //{
-        //    return NotFound(new ProblemDetails
-        //    {
-        //        Title = "Provider not found",
-        //        Detail = $"Provider with ID {payload.ProviderId} does not exist.",
-        //        Status = StatusCodes.Status404NotFound,
-        //        Instance = HttpContext.Request.Path
-        //    });
-        //}
+
+        var existingProvider = await _context.Providers.FindAsync(payload.ProviderId);
+        if (existingProvider == null)
+        {
+            return NotFound(new ProblemDetails
+            {
+                Title = "Provider not found",
+                Detail = $"Provider with ID {payload.ProviderId} does not exist.",
+                Status = StatusCodes.Status404NotFound,
+                Instance = HttpContext.Request.Path
+            });
+        }
+
         package.ProviderId = payload.ProviderId;
         package.Name = payload.Name;
         package.Description = payload.Description;
@@ -156,7 +160,7 @@ public class Controller : ControllerBase
         package.LastUpdated = DateTime.UtcNow;
         _context.Packages.Update(package);
         await _context.SaveChangesAsync();
-        await _messageBus.PublishAsync(new Update.Messager.Message(payload.Id));
+        await _messageBus.PublishAsync(new Put.Messager.Message(payload.Id));
         await _hubContext.Clients.All.SendAsync("package-updated", payload.Id);
         return NoContent();
     }

@@ -1,3 +1,3 @@
 ﻿namespace Iowa.Packages.Delete.Messager;
 
-public class Message(Guid Id);
+public record Message(Guid Id);

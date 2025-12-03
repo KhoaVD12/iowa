@@ -7,6 +7,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Databases\App\Migrations\**" />
+	  <Content Remove="Databases\App\Migrations\**" />
+	  <EmbeddedResource Remove="Databases\App\Migrations\**" />
+	  <None Remove="Databases\App\Migrations\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
 			<PrivateAssets>all</PrivateAssets>
