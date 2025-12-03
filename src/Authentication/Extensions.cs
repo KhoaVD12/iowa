@@ -1,0 +1,52 @@
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
+
+namespace Iowa.Authentication;
+
+public static class Extensions
+{
+    public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddMemoryCache(); 
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultScheme = "Combined";
+            options.DefaultAuthenticateScheme = "Combined";
+            options.DefaultChallengeScheme = "Combined";
+        })
+        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = configuration["JWT:Issuer"],
+                ValidAudience = configuration["JWT:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(configuration["JWT:Key"]!)),
+                RoleClaimType = ClaimTypes.Role
+            };
+        })
+        .AddScheme<AuthenticationSchemeOptions, HmacAuthenticationHandler>("HMAC", options => { })
+        .AddPolicyScheme("Combined", "JWT or HMAC", options =>
+        {
+            options.ForwardDefaultSelector = context =>
+            {
+                var hasBearer = context.Request.Headers["Authorization"].FirstOrDefault()?.StartsWith("Bearer ") == true;
+                var hasHmac = context.Request.Headers.ContainsKey("X-Machine-Hash");
+
+                if (hasBearer) return JwtBearerDefaults.AuthenticationScheme;
+                if (hasHmac) return "HMAC";
+
+                return JwtBearerDefaults.AuthenticationScheme;
+            };
+        });
+        return services;
+    }
+}
