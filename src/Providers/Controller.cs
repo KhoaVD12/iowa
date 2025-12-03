@@ -1,5 +1,6 @@
 ﻿using Iowa.Databases.App;
 using Iowa.Databases.App.Tables.Provider;
+using Iowa.Models.PaginationResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,8 @@ public class Controller : ControllerBase
     public async Task<IActionResult> Get([FromQuery] Get.Parameters parameters)
     {
         var query = _context.Providers.AsQueryable();
+        var all = query;
+
 
         if (parameters.Id.HasValue)
             query = query.Where(x => x.Id == parameters.Id.Value);
@@ -56,8 +59,34 @@ public class Controller : ControllerBase
         if (parameters.UpdatedById.HasValue)
             query = query.Where(x => x.UpdatedById == parameters.UpdatedById.Value);
 
+        //if (!string.IsNullOrEmpty(parameters.SortBy))
+        //{
+        //    var sortBy = typeof(Databases.App.Tables.Package.Table)
+        //        .GetProperties()
+        //        .FirstOrDefault(p => p.Name.Equals(parameters.SortBy, StringComparison.OrdinalIgnoreCase))
+        //        ?.Name;
+        //    if (sortBy != null)
+        //    {
+        //        query = parameters.SortOrder?.ToLower() == "desc"
+        //            ? query.OrderByDescending(x => EF.Property<object>(x, sortBy))
+        //            : query.OrderBy(x => EF.Property<object>(x, sortBy));
+        //    }
+        //}
+
+        if (parameters.PageSize.HasValue && parameters.PageIndex.HasValue && parameters.PageSize > 0 && parameters.PageIndex.Value >= 0)
+            query = query.Skip(parameters.PageSize.Value * parameters.PageIndex.Value).Take(parameters.PageSize.Value);
+
         var providers = await query.AsNoTracking().ToListAsync();
-        return Ok(providers);
+
+        var paginationResults = new Builder<Table>()
+          .WithAll(await all.CountAsync())
+          .WithIndex(parameters.PageIndex)
+          .WithSize(parameters.PageSize)
+          .WithTotal(providers.Count)
+          .WithItems(providers)
+          .Build();
+
+        return Ok(paginationResults);
     }
 
     [HttpPost]
@@ -103,13 +132,13 @@ public class Controller : ControllerBase
         provider.UpdatedById = Guid.NewGuid();
         _context.Providers.Update(provider);
         await _context.SaveChangesAsync();
-        await _messageBus.PublishAsync(new Put.Messager.Message(provider.Id));
-        await _hubContext.Clients.All.SendAsync("provider-updated", provider.Id);
+        await _messageBus.PublishAsync(new Put.Messager.Message(payload.Id));
+        await _hubContext.Clients.All.SendAsync("provider-updated", payload.Id);
         return NoContent();
     }
 
     [HttpDelete]
-    public async Task<IActionResult> Delete([FromBody] Delete.Parameters parameters)
+    public async Task<IActionResult> Delete([FromQuery] Delete.Parameters parameters)
     {
         var provider = await _context.Providers.FindAsync(parameters.Id);
         if (provider == null)
@@ -124,8 +153,8 @@ public class Controller : ControllerBase
         }
         _context.Providers.Remove(provider);
         await _context.SaveChangesAsync();
-        await _messageBus.PublishAsync(new Delete.Messager.Message(provider.Id));
-        await _hubContext.Clients.All.SendAsync("provider-deleted", provider.Id);
+        await _messageBus.PublishAsync(new Delete.Messager.Message(parameters.Id));
+        await _hubContext.Clients.All.SendAsync("parameters-deleted", parameters.Id);
         return NoContent();
     }
 }

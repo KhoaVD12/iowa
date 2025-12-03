@@ -7,13 +7,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Databases\App\Migrations\**" />
-	  <Content Remove="Databases\App\Migrations\**" />
-	  <EmbeddedResource Remove="Databases\App\Migrations\**" />
-	  <None Remove="Databases\App\Migrations\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
 			<PrivateAssets>all</PrivateAssets>
@@ -23,6 +16,10 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
 		</PackageReference>
 		<PackageReference Include="WolverineFx.EntityFrameworkCore" Version="5.4.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Databases\App\Migrations\" />
 	</ItemGroup>
 
 </Project>
