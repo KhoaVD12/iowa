@@ -155,8 +155,8 @@ public class Controller : ControllerBase
         if (entity == null)
             return NotFound(new ProblemDetails
             {
-                Title = "Week Plan not found",
-                Detail = $"Week Plan with ID {id} does not exist.",
+                Title = "Subscription not found",
+                Detail = $"Subscription with ID {id} does not exist.",
                 Status = StatusCodes.Status404NotFound,
                 Instance = HttpContext.Request.Path
             });
