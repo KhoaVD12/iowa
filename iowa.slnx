@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="lib/Library.csproj" />
+  <Project Path="lib/Provider.csproj" />
   <Project Path="src/Iowa.csproj" />
   <Project Path="test/Test.csproj" />
 </Solution>
