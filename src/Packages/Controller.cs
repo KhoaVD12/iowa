@@ -12,6 +12,7 @@ using Wolverine;
 namespace Iowa.Packages;
 
 [ApiController]
+[Authorize]
 [Route("api/packages")]
 public class Controller : ControllerBase
 {

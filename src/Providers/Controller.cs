@@ -1,6 +1,7 @@
 ﻿using Iowa.Databases.App;
 using Iowa.Databases.App.Tables.Provider;
 using Iowa.Models.PaginationResults;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using Wolverine;
 namespace Iowa.Providers;
 
 [ApiController]
+[Authorize]
 [Route("api/providers")]
 public class Controller : ControllerBase
 {
@@ -26,6 +28,7 @@ public class Controller : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> Get([FromQuery] Get.Parameters parameters)
     {
         var query = _context.Providers.AsQueryable();
