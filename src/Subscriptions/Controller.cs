@@ -1,23 +1,31 @@
 ﻿using Iowa.Databases.App;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using System.Security.Claims;
 using Wolverine;
 
-namespace Iowa.Subcriptions;
+namespace Iowa.Subscriptions;
 
 [Route("api/subscriptions")]
+[Authorize]
 [ApiController]
 public class Controller : ControllerBase
 {
     private readonly IowaContext _context;
     private readonly IMessageBus _messageBus;
-    public Controller(IowaContext context, IMessageBus messageBus)
+    private readonly IHubContext<Hub> _hubContext;
+    public Controller(IowaContext context, IMessageBus messageBus, IHubContext<Hub> hubContext)
     {
         _context = context;
         _messageBus = messageBus;
+        _hubContext = hubContext;
     }
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] Subscriptions.Get.Parameters parameters)
+    public async Task<IActionResult> Get([FromQuery] Get.Parameters parameters)
     {
         var query = _context.Subcriptions.AsQueryable();
 
@@ -55,10 +63,16 @@ public class Controller : ControllerBase
         return Ok(subscriptions);
     }
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] Subscriptions.Post.Payload payload)
+    public async Task<IActionResult> Post([FromBody] Post.Payload payload)
     {
         var table = new Databases.App.Tables.Subcription.Table
         { };
+        var existingPackage = await _context.Packages.FindAsync(payload.PackageId);
+
+        if (existingPackage is null)
+        {
+            return NotFound($"Package with Id: {payload.PackageId} not found");
+        }
 
         table.Id = Guid.NewGuid();
         table.UserId = payload.UserId;
@@ -76,36 +90,90 @@ public class Controller : ControllerBase
 
         _context.Subcriptions.Add(table);
         await _context.SaveChangesAsync();
-        await _messageBus.PublishAsync(new Subscriptions.Post.Messager.Message(table.Id));
+        await _messageBus.PublishAsync(new Post.Messager.Message(table.Id));
+        await _hubContext.Clients.All.SendAsync("subscription-created", table.Id);
         return CreatedAtAction(nameof(Post), new { id = table.Id });
     }
     [HttpPut]
-    public async Task<IActionResult> Put([FromBody] Subscriptions.Put.Payload payload)
+    public async Task<IActionResult> Put([FromBody] Put.Payload payload)
     {
-        var table = _context.Subcriptions.FirstOrDefault(x => x.Id == payload.Id);
-        if (table == null)
+        var existSubscription = _context.Subcriptions.FirstOrDefault(x => x.Id == payload.Id);
+        if (existSubscription == null)
         {
             return NotFound();
         }
+        var existingPackage = await _context.Packages.FindAsync(payload.PackageId);
 
-        table.UserId = payload.UserId;
-        table.ProviderId = payload.ProviderId;
-        table.PackageId = payload.PackageId;
-        table.Price =  payload.Price;
-        table.DiscountedPrice = payload.DiscountedPrice;
-        table.Currency = payload.Currency;
-        table.ChartColor = payload.ChartColor;
-        table.DiscountId = payload.DiscountId;
-        table.RenewalDate = payload.RenewalDate;
-        table.LastUpdated = DateTime.UtcNow;
-        table.UpdatedById = payload.UserId;
+        if (existingPackage is null)
+        {
+            return NotFound($"Package with Id: {payload.PackageId} not found");
+        }
 
-        _context.Subcriptions.Update(table);
+        existSubscription.UserId = payload.UserId;
+        existSubscription.ProviderId = payload.ProviderId;
+        existSubscription.PackageId = payload.PackageId;
+        existSubscription.Price =  payload.Price;
+        existSubscription.DiscountedPrice = payload.DiscountedPrice;
+        existSubscription.Currency = payload.Currency;
+        existSubscription.ChartColor = payload.ChartColor;
+        existSubscription.DiscountId = payload.DiscountId;
+        existSubscription.RenewalDate = payload.RenewalDate;
+        existSubscription.LastUpdated = DateTime.UtcNow;
+        existSubscription.UpdatedById = payload.UserId;
+
+        _context.Subcriptions.Update(existSubscription);
         await _context.SaveChangesAsync();
+        await _messageBus.PublishAsync(new Put.Messager.Message(payload.Id));
+        await _hubContext.Clients.All.SendAsync("subscription-updated", payload.Id);
         return NoContent();
     }
+
+    [HttpPatch]
+    public async Task<IActionResult> Patch([FromQuery] Guid id,
+                                   [FromBody] JsonPatchDocument<Databases.App.Tables.Subcription.Table> patchDoc,
+                                   CancellationToken cancellationToken = default!)
+    {
+        if (User.Identity is null)
+            return Unauthorized();
+
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId is null)
+            return Unauthorized("User Id not found");
+
+        var changes = new List<(string Path, object? Value)>();
+        foreach (var op in patchDoc.Operations)
+        {
+            if (op.OperationType != OperationType.Replace && op.OperationType != OperationType.Test)
+                return BadRequest("Only Replace and Test operations are allowed in this patch request.");
+            changes.Add((op.path, op.value));
+        }
+
+        if (patchDoc is null)
+            return BadRequest("Patch document cannot be null.");
+
+        var entity = await _context.Subcriptions.FindAsync(id, cancellationToken);
+        if (entity == null)
+            return NotFound(new ProblemDetails
+            {
+                Title = "Subscription not found",
+                Detail = $"Subscription with ID {id} does not exist.",
+                Status = StatusCodes.Status404NotFound,
+                Instance = HttpContext.Request.Path
+            });
+
+        patchDoc.ApplyTo(entity);
+
+        entity.LastUpdated = DateTime.UtcNow;
+
+        _context.Subcriptions.Update(entity);
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        
+        return NoContent();
+    }
+
     [HttpDelete]
-    public async Task<IActionResult> Delete([FromQuery] Subscriptions.Delete.Parameters parameters)
+    public async Task<IActionResult> Delete([FromQuery] Delete.Parameters parameters)
     {
         var table = _context.Subcriptions.FirstOrDefault(x => x.Id == parameters.Id);
         if (table == null)
@@ -114,6 +182,8 @@ public class Controller : ControllerBase
         }
         _context.Subcriptions.Remove(table);
         await _context.SaveChangesAsync();
+        await _messageBus.PublishAsync(new Delete.Messager.Message(parameters.Id));
+        await _hubContext.Clients.All.SendAsync("subscription-deleted", parameters.Id);
         return NoContent();
     }
 }

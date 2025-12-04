@@ -1,9 +1,9 @@
 ﻿using Iowa.Databases.App;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Iowa.Subscriptions;
+namespace Iowa.Providers;
 
-public class Hub: Microsoft.AspNetCore.SignalR.Hub
+public sealed class Hub : Microsoft.AspNetCore.SignalR.Hub
 {
     #region [ Fields ]
 
@@ -25,3 +25,4 @@ public class Hub: Microsoft.AspNetCore.SignalR.Hub
     }
     #endregion
 }
+

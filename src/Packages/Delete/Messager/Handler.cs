@@ -1,5 +1,19 @@
-﻿namespace Iowa.Packages.Delete.Messager;
+﻿using Iowa.Databases.App;
+using Microsoft.EntityFrameworkCore;
 
-public class Handler
+namespace Iowa.Packages.Delete.Messager;
+
+public class Handler(IowaContext context)
 {
+    private readonly IowaContext _context = context;
+
+    public async Task Handle(Message message)
+    {
+        var existSubscriptions = _context.Subcriptions.Where(x => x.PackageId == message.Id);
+        if (existSubscriptions.Any())
+        {
+            await _context.Subcriptions.Where(x => x.PackageId == message.Id).ExecuteDeleteAsync();
+        }
+        await _context.SaveChangesAsync();
+    }
 }
