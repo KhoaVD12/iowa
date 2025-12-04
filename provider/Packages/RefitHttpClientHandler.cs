@@ -1,0 +1,27 @@
+﻿namespace Provider.Packages;
+
+public class RefitHttpClientHandler : HttpClientHandler
+{
+    private readonly Config config;
+    private readonly MachineToken.Service machineTokenService;
+    public RefitHttpClientHandler(Config config,
+                                  MachineToken.Service machineTokenService)
+    {
+        this.config = config;
+        this.machineTokenService = machineTokenService;
+    }
+
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        if (!string.IsNullOrEmpty(config.SecretKey) && !string.IsNullOrWhiteSpace(config.SecretKey))
+        {
+            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+            string nonce = Guid.NewGuid().ToString("N").Substring(0, 8);
+            request.Headers.Add("X-Timestamp", timestamp);
+            request.Headers.Add("X-Nonce", nonce);
+            request.Headers.Add("X-Machine-Hash", machineTokenService.ComputeHash(timestamp, nonce));
+        }
+
+        return await base.SendAsync(request, cancellationToken);
+    }
+}

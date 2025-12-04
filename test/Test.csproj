@@ -15,6 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\lib\Provider.csproj" />
+    <ProjectReference Include="..\provider\Provider.csproj" />
+    <ProjectReference Include="..\src\Iowa.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

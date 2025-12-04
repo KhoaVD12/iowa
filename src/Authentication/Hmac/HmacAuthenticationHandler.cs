@@ -6,33 +6,32 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
 
-namespace Iowa.Authentication;
+namespace Iowa.Authentication.Hmac;
 
-public class HmacAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+public class HmacAuthenticationHandler : AuthenticationHandler<HmacOptions>
 {
-    private readonly IConfiguration _configuration;
     private readonly IMemoryCache _cache;
+    private readonly IOptionsMonitor<HmacOptions> _options;
 
     public HmacAuthenticationHandler(
-        IOptionsMonitor<AuthenticationSchemeOptions> options,
+        IOptionsMonitor<HmacOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
         ISystemClock clock,
-        IConfiguration configuration,
         IMemoryCache cache)
         : base(options, logger, encoder, clock)
     {
-        _configuration = configuration;
         _cache = cache;
+        _options = options;
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var headers = Request.Headers;
-        var timestamp = headers["X-Timestamp"].FirstOrDefault();
-        var machineHash = headers["X-Machine-Hash"].FirstOrDefault();
-        var nonce = headers["X-Nonce"].FirstOrDefault();
-        var secretKey = _configuration["MachineAuth:SecretKey"];
+        var timestamp = headers[_options.CurrentValue.HeaderTimestamp].FirstOrDefault();
+        var machineHash = headers[_options.CurrentValue.HeaderMachineHash].FirstOrDefault();
+        var nonce = headers[_options.CurrentValue.HeaderNonce].FirstOrDefault();
+        var secretKey = _options.CurrentValue.SecretKey;
 
         if (string.IsNullOrEmpty(timestamp) || string.IsNullOrEmpty(machineHash) || string.IsNullOrEmpty(nonce))
         {
@@ -45,9 +44,9 @@ public class HmacAuthenticationHandler : AuthenticationHandler<AuthenticationSch
             return Task.FromResult(AuthenticateResult.Fail("Replay attack detected."));
         }
 
-        _cache.Set(nonceKey, true, TimeSpan.FromMinutes(5));
+        _cache.Set(nonceKey, true, Options.NonceLifetime);
 
-        var message = secretKey + timestamp + nonce;
+        var message = timestamp + nonce;
         using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secretKey));
         var computedHash = BitConverter.ToString(hmac.ComputeHash(Encoding.UTF8.GetBytes(message))).Replace("-", "").ToLower();
 
