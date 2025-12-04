@@ -1,10 +1,13 @@
 ﻿using Iowa.Databases.App;
+using Iowa.Models.PaginationResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Build.Tasks;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Wolverine;
 
@@ -25,6 +28,7 @@ public class Controller : ControllerBase
         _hubContext = hubContext;
     }
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> Get([FromQuery] Get.Parameters parameters)
     {
         var query = _context.Subcriptions.AsQueryable();
@@ -58,9 +62,19 @@ public class Controller : ControllerBase
             query = query.Where(x => x.ChartColor == parameters.ChartColor);
         }
         query = query.OrderByDescending(x => x.CreatedDate);
+        if (parameters.PageSize.HasValue && parameters.PageIndex.HasValue && parameters.PageSize > 0 && parameters.PageIndex.Value >= 0)
+            query = query.Skip(parameters.PageSize.Value * parameters.PageIndex.Value).Take(parameters.PageSize.Value);
 
-        var subscriptions = query.ToList();
-        return Ok(subscriptions);
+        var subscriptions = await query.AsNoTracking().ToListAsync();
+        var paginationResults = new Builder<Databases.App.Tables.Subcription.Table>()
+         .WithAll(await query.CountAsync())
+         .WithIndex(parameters.PageIndex)
+         .WithSize(parameters.PageSize)
+         .WithTotal(subscriptions.Count)
+         .WithItems(subscriptions)
+         .Build();
+
+        return Ok(paginationResults);
     }
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] Post.Payload payload)
@@ -71,7 +85,13 @@ public class Controller : ControllerBase
 
         if (existingPackage is null)
         {
-            return NotFound($"Package with Id: {payload.PackageId} not found");
+            return NotFound(new ProblemDetails
+            {
+                Title = "Package not found",
+                Detail = $"Package with ID {payload.PackageId} does not exist.",
+                Status = StatusCodes.Status404NotFound,
+                Instance = HttpContext.Request.Path
+            });
         }
 
         table.Id = Guid.NewGuid();
@@ -100,13 +120,25 @@ public class Controller : ControllerBase
         var existSubscription = _context.Subcriptions.FirstOrDefault(x => x.Id == payload.Id);
         if (existSubscription == null)
         {
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Title = "Subscription not found",
+                Detail = $"Subscription with ID {payload.Id} does not exist.",
+                Status = StatusCodes.Status404NotFound,
+                Instance = HttpContext.Request.Path
+            });
         }
         var existingPackage = await _context.Packages.FindAsync(payload.PackageId);
 
         if (existingPackage is null)
         {
-            return NotFound($"Package with Id: {payload.PackageId} not found");
+            return NotFound(new ProblemDetails
+            {
+                Title = "Package not found",
+                Detail = $"Package with ID {payload.PackageId} does not exist.",
+                Status = StatusCodes.Status404NotFound,
+                Instance = HttpContext.Request.Path
+            });
         }
 
         existSubscription.UserId = payload.UserId;
@@ -178,7 +210,13 @@ public class Controller : ControllerBase
         var table = _context.Subcriptions.FirstOrDefault(x => x.Id == parameters.Id);
         if (table == null)
         {
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Title = "Subscription not found",
+                Detail = $"Subscription with ID {parameters.Id} does not exist.",
+                Status = StatusCodes.Status404NotFound,
+                Instance = HttpContext.Request.Path
+            });
         }
         _context.Subcriptions.Remove(table);
         await _context.SaveChangesAsync();

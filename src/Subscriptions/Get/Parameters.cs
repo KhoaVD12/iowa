@@ -9,4 +9,6 @@ public class Parameters
     public string? Currency { get; set; }
     public string ChartColor { get; set; } = string.Empty;
     public string? Status { get; set; }
+    public int? PageIndex { get; set; }
+    public int? PageSize { get; set; }
 }
