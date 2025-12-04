@@ -14,8 +14,6 @@ builder.Services.AddSignalR(x => x.EnableDetailedErrors = true);
 
 var app = builder.Build();
 
-
-
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

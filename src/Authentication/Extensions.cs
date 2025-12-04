@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Iowa.Authentication.Hmac;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
@@ -10,8 +11,8 @@ public static class Extensions
 {
     public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddMemoryCache(); 
-
+        services.AddMemoryCache();
+        services.Configure<HmacOptions>(configuration.GetSection("MachineAuth"));
         services.AddAuthentication(options =>
         {
             options.DefaultScheme = "Combined";
@@ -33,7 +34,11 @@ public static class Extensions
                 RoleClaimType = ClaimTypes.Role
             };
         })
-        .AddScheme<AuthenticationSchemeOptions, HmacAuthenticationHandler>("HMAC", options => { })
+        .AddScheme<HmacOptions, HmacAuthenticationHandler>("HMAC", options =>
+        {
+            options.SecretKey = configuration["MachineAuth:SecretKey"];
+            options.NonceLifetime = TimeSpan.FromMinutes(5);
+        })
         .AddPolicyScheme("Combined", "JWT or HMAC", options =>
         {
             options.ForwardDefaultSelector = context =>
