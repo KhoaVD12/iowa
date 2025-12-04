@@ -11,7 +11,7 @@ public interface IRefitInterface
 
     [Put("/api/packages")]
     Task<ApiResponse<object>> Put([Body] Put.Payload payload);
-
+    
     [Delete("/api/packages")]
     Task<ApiResponse<object>> Delete([Query] Delete.Parameters parameters);
 
