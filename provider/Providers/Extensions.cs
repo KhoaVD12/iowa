@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Refit;
 
-namespace Provider.Packages;
+namespace Provider.Providers;
 
 public static class Extensions
 {
-    public static void RegisterPackages(this IServiceCollection services, Config config)
+    public static void RegisterProviders(this IServiceCollection services, Config config)
     {
         services.AddTransient<RefitHttpClientHandler>();
 

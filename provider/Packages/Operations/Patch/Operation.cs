@@ -1,4 +1,4 @@
-﻿namespace Provider.Packages.Patch;
+﻿namespace Provider.Packages.Operations.Patch;
 
 public class Operation
 {
