@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Iowa.Databases.IdentityMigrations
+namespace Iowa.Databases.Identity.Migrations
 {
     /// <inheritdoc />
-    public partial class InitIdentity : Migration
+    public partial class Iowa : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Provider.Packages;
+using Provider.Providers;
+using Provider.Subscriptions;
 
 namespace Provider;
 
@@ -9,7 +11,9 @@ public static class Extensions
     {
         services.AddSingleton(config);
         services.AddTransient<MachineToken.Service>();
+        services.RegisterPackages(config);
         services.RegisterSubscriptions(config);
+        services.RegisterProviders(config);
         return services;
     }
 }

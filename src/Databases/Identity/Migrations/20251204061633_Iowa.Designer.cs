@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Iowa.Databases.IdentityMigrations
+namespace Iowa.Databases.Identity.Migrations
 {
     [DbContext(typeof(IdentityContext))]
-    [Migration("20251204094611_InitIdentity")]
-    partial class InitIdentity
+    [Migration("20251204061633_Iowa")]
+    partial class Iowa
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

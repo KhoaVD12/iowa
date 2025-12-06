@@ -27,7 +27,7 @@ public class Controller : ControllerBase
     [Route("register")]
     [AllowAnonymous]
     public async Task<IActionResult> RegisterAsync([FromForm] Register.Payload form)
-    {
+    {   
         var newAccount = new IdentityUser
         {
             UserName = form.UserName,

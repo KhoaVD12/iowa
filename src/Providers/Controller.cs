@@ -2,9 +2,12 @@
 using Iowa.Databases.App.Tables.Provider;
 using Iowa.Models.PaginationResults;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using Wolverine;
 
 namespace Iowa.Providers;
@@ -28,7 +31,6 @@ public class Controller : ControllerBase
     }
 
     [HttpGet]
-    [AllowAnonymous]
     public async Task<IActionResult> Get([FromQuery] Get.Parameters parameters)
     {
         var query = _context.Providers.AsQueryable();
@@ -137,6 +139,48 @@ public class Controller : ControllerBase
         await _context.SaveChangesAsync();
         await _messageBus.PublishAsync(new Put.Messager.Message(payload.Id));
         await _hubContext.Clients.All.SendAsync("provider-updated", payload.Id);
+        return NoContent();
+    }
+
+    [HttpPatch]
+    public async Task<IActionResult> Patch([FromQuery] Guid id,
+                                       [FromBody] JsonPatchDocument<Table> patchDoc,
+                                       CancellationToken cancellationToken = default!)
+    {
+        if (User.Identity is null)
+            return Unauthorized();
+
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId is null)
+            return Unauthorized("User Id not found");
+        var changes = new List<(string Path, object? Value)>();
+
+        foreach (var op in patchDoc.Operations)
+        {
+            if (op.OperationType != OperationType.Replace && op.OperationType != OperationType.Test)
+                return BadRequest("Only Replace and Test operations are allowed in this patch request.");
+            changes.Add((op.path, op.value));
+        }
+
+        if (patchDoc is null)
+            return BadRequest("Patch document cannot be null.");
+
+        var entity = await _context.Providers.FindAsync(id, cancellationToken);
+        if (entity == null)
+            return NotFound(new ProblemDetails
+            {
+                Title = "Provider not found",
+                Detail = $"Provider with ID {id} does not exist.",
+                Status = StatusCodes.Status404NotFound,
+                Instance = HttpContext.Request.Path
+            });
+
+        patchDoc.ApplyTo(entity);
+        entity.LastUpdated = DateTime.UtcNow;
+        _context.Providers.Update(entity);
+        await _context.SaveChangesAsync(cancellationToken);
+        await _hubContext.Clients.All.SendAsync("provider-patched", entity.Id);
+
         return NoContent();
     }
 
