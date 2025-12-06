@@ -10,9 +10,9 @@ namespace Iowa.Databases
         public static IServiceCollection AddDatabases(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<IowaContext>(options =>
-                options.UseSqlServer("Server=localhost;Database=Iowa;Trusted_Connection=True;TrustServerCertificate=True"));
+                options.UseSqlServer("Server=.\\SQLEXPRESS;Database=IowaDb;Trusted_Connection=True;TrustServerCertificate=True"));
             services.AddDbContext<IdentityContext>(options =>
-                options.UseSqlServer("Server=localhost;Database=IowaIdentity;Trusted_Connection=True;TrustServerCertificate=True"));
+                options.UseSqlServer("Server=.\\SQLEXPRESS;Database=IowaIdentity;Trusted_Connection=True;TrustServerCertificate=True"));
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<IdentityContext>()
                 .AddDefaultTokenProviders();
