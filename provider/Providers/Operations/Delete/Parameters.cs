@@ -1,4 +1,4 @@
-﻿namespace Provider.Providers.Operations.Delete;
+﻿namespace Provider.Providers.Delete;
 
 public class Parameters
 {

@@ -1,4 +1,4 @@
-﻿namespace Provider.Providers.Operations.Patch;
+﻿namespace Provider.Providers.Patch;
 
 public class Parameters
 {

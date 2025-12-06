@@ -1,22 +1,20 @@
-﻿using Provider.Packages.Operations.Patch;
-
-using Refit;
+﻿using Refit;
 namespace Provider.Packages;
 
 public interface IRefitInterface
 {
     [Get("/api/packages")]
-    Task<ApiResponse<Models.PaginationResults.Model<Model>>> Get([Query] Operations.Get.Parameters parameters);
+    Task<ApiResponse<Models.PaginationResults.Model<Model>>> Get([Query] Get.Parameters parameters);
 
     [Post("/api/packages")]
-    Task<ApiResponse<object>> Post([Body] Operations.Post.Payload payload);
+    Task<ApiResponse<object>> Post([Body] Post.Payload payload);
 
     [Put("/api/packages")]
-    Task<ApiResponse<object>> Put([Body] Operations.Put.Payload payload);
+    Task<ApiResponse<object>> Put([Body] Put.Payload payload);
 
     [Delete("/api/packages")]
-    Task<ApiResponse<object>> Delete([Query] Operations.Delete.Parameters parameters);
+    Task<ApiResponse<object>> Delete([Query] Delete.Parameters parameters);
 
     [Patch("/api/packages")]
-    Task<ApiResponse<object>> Patch([Query] Operations.Patch.Parameters parameters, [Body] List<Operation> operations);
+    Task<ApiResponse<object>> Patch([Query] Patch.Parameters parameters, [Body] List<Patch.Operation> operations);
 }

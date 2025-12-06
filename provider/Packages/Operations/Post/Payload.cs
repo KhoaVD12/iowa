@@ -1,4 +1,4 @@
-﻿namespace Provider.Packages.Operations.Post;
+﻿namespace Provider.Packages.Post;
 
 public class Payload
 {

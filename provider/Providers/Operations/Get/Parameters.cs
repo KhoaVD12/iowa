@@ -1,4 +1,4 @@
-﻿namespace Provider.Providers.Operations.Get;
+﻿namespace Provider.Providers.Get;
 
 public class Parameters
 {

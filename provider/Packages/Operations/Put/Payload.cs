@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Provider.Packages.Operations.Put;
+namespace Provider.Packages.Put;
 
 public class Payload
 {

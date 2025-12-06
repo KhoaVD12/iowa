@@ -1,4 +1,4 @@
-﻿namespace Provider.Providers.Operations.Put;
+﻿namespace Provider.Providers.Put;
 
 public class Payload
 {
