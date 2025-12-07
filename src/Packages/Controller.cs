@@ -89,13 +89,13 @@ public class Controller : ControllerBase
 
         var packages = await query.AsNoTracking().ToListAsync();
 
-          var paginationResults = new Builder<Table>()
-           .WithAll(await all.CountAsync())
-           .WithIndex(parameters.PageIndex)
-           .WithSize(parameters.PageSize)
-           .WithTotal(packages.Count)
-           .WithItems(packages)
-           .Build();
+        var paginationResults = new Builder<Table>()
+         .WithAll(await all.CountAsync())
+         .WithIndex(parameters.PageIndex)
+         .WithSize(parameters.PageSize)
+         .WithTotal(packages.Count)
+         .WithItems(packages)
+         .Build();
 
         //không có bắn message
         return Ok(paginationResults);
@@ -178,6 +178,48 @@ public class Controller : ControllerBase
         return NoContent();
     }
 
+    [HttpPatch]
+    public async Task<IActionResult> Patch([FromQuery] Guid id,
+                                       [FromBody] JsonPatchDocument<Table> patchDoc,
+                                       CancellationToken cancellationToken = default!)
+    {
+        if (User.Identity is null)
+            return Unauthorized();
+
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId is null)
+            return Unauthorized("User Id not found");
+        var changes = new List<(string Path, object? Value)>();
+
+        foreach (var op in patchDoc.Operations)
+        {
+            if (op.OperationType != OperationType.Replace && op.OperationType != OperationType.Test)
+                return BadRequest("Only Replace and Test operations are allowed in this patch request.");
+            changes.Add((op.path, op.value));
+        }
+
+        if (patchDoc is null)
+            return BadRequest("Patch document cannot be null.");
+
+        var entity = await _context.Packages.FindAsync(id, cancellationToken);
+        if (entity == null)
+            return NotFound(new ProblemDetails
+            {
+                Title = "Package not found",
+                Detail = $"Package with ID {id} does not exist.",
+                Status = StatusCodes.Status404NotFound,
+                Instance = HttpContext.Request.Path
+            });
+
+        patchDoc.ApplyTo(entity);
+        entity.LastUpdated = DateTime.UtcNow;
+        _context.Packages.Update(entity);
+        await _context.SaveChangesAsync(cancellationToken);
+        await _hubContext.Clients.All.SendAsync("package-patched", entity.Id);
+
+        return NoContent();
+    }
+
     [HttpDelete]
     public async Task<IActionResult> Delete([FromQuery] Delete.Parameters parameters)
     {
@@ -200,41 +242,5 @@ public class Controller : ControllerBase
         return NoContent();
     }
 
-    [HttpPatch]
-    public async Task<IActionResult> Patch([FromQuery] Guid id,
-                                       [FromBody] JsonPatchDocument<Databases.App.Tables.Package.Table> patchDoc,
-                                       CancellationToken cancellationToken = default!)
-    {
-        //if (User.Identity is null)
-        //    return Unauthorized();
 
-        //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //if (userId is null)
-        //    return Unauthorized("User Id not found");
-
-        foreach (var op in patchDoc.Operations)
-            if (op.OperationType != OperationType.Replace && op.OperationType != OperationType.Test)
-                return BadRequest("Only Replace and Test operations are allowed in this patch request.");
-
-        if (patchDoc is null)
-            return BadRequest("Patch document cannot be null.");
-
-        var entity = await _context.Packages.FindAsync(id, cancellationToken);
-        if (entity == null)
-            return NotFound(new ProblemDetails
-            {
-                Title = "Team Pool not found",
-                Detail = $"Team Pool with ID {id} does not exist.",
-                Status = StatusCodes.Status404NotFound,
-                Instance = HttpContext.Request.Path
-            });
-
-        patchDoc.ApplyTo(entity);
-
-        _context.Packages.Update(entity);
-        await _context.SaveChangesAsync(cancellationToken);
-        await _hubContext.Clients.All.SendAsync("team-pool-updated", entity.Id);
-
-        return NoContent();
-    }
 }
