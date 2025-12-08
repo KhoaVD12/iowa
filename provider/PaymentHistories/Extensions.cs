@@ -5,7 +5,7 @@ namespace Provider.PaymentHistories;
 
 public static class Extensions
 {
-    public static void RegisterPackages(this IServiceCollection services, Config config)
+    public static void RegisterPaymentHistories(this IServiceCollection services, Config config)
     {
         services.AddTransient<RefitHttpClientHandler>();
 
