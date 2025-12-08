@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Provider;
-using Provider.Providers.Operations.Patch;
+using Provider.Providers.Patch;
 
 namespace Test.Providers;
 
@@ -68,7 +68,7 @@ public class Test
         var id = Guid.NewGuid();
         var name = $"TEST PROVIDER {id}";
 
-        var payload = new Provider.Providers.Operations.Post.Payload
+        var payload = new Provider.Providers.Post.Payload
         {
             Name = name,
             Description = "POST TEST PROVIDER",
@@ -109,7 +109,7 @@ public class Test
 
         var endpoint = serviceProvider!.GetRequiredService<Provider.Providers.IRefitInterface>();
 
-        var payload = new Provider.Providers.Operations.Put.Payload
+        var payload = new Provider.Providers.Put.Payload
         {
             Id = provider.Id,
             Name = "UPDATED PROVIDER",
@@ -151,7 +151,7 @@ public class Test
 
         var endpoint = serviceProvider!.GetRequiredService<Provider.Providers.IRefitInterface>();
 
-        await endpoint.Delete(new Provider.Providers.Operations.Delete.Parameters { Id = provider.Id });
+        await endpoint.Delete(new Provider.Providers.Delete.Parameters { Id = provider.Id });
 
         var deleted = await dbContext.Providers.FindAsync(provider.Id);
         Assert.Null(deleted);
@@ -187,7 +187,7 @@ public class Test
         };
 
         await endpoint.Patch(
-            new Provider.Providers.Operations.Patch.Parameters { Id = provider.Id },
+            new Provider.Providers.Patch.Parameters { Id = provider.Id },
             operations
         );
 

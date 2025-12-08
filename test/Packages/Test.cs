@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Provider;
-using Provider.Packages.Operations.Patch;
+using Provider.Packages.Patch;
 
 namespace Test.Packages;
 
@@ -86,7 +86,7 @@ public class Test
         string description = "A basic TEST PACKAGE for testing POST.";
         var packagesEndpoint = serviceProvider!.GetRequiredService<Provider.Packages.IRefitInterface>();
 
-        var payload = new Provider.Packages.Operations.Post.Payload
+        var payload = new Provider.Packages.Post.Payload
         {
             ProviderId = provider.Id,
             Name = name,
@@ -147,7 +147,7 @@ public class Test
         await dbContext.SaveChangesAsync();
 
         var packagesEndpoint = serviceProvider!.GetRequiredService<Provider.Packages.IRefitInterface>();
-        var payload = new Provider.Packages.Operations.Put.Payload
+        var payload = new Provider.Packages.Put.Payload
         {
             Id = id,
             Name = "UPDATED TEST PACKAGE",
@@ -211,7 +211,7 @@ public class Test
         await dbContext.SaveChangesAsync();
 
         var packagesEndpoint = serviceProvider!.GetRequiredService<Provider.Packages.IRefitInterface>();
-        await packagesEndpoint.Delete(new Provider.Packages.Operations.Delete.Parameters { Id = id });
+        await packagesEndpoint.Delete(new Provider.Packages.Delete.Parameters { Id = id });
 
         await dbContext.Entry(existingPackage).ReloadAsync();
 
@@ -267,7 +267,7 @@ public class Test
         new Operation { op = "replace", path = "/Price", value = 49.99m }
     };
 
-        await packagesEndpoint.Patch(new Provider.Packages.Operations.Patch.Parameters { Id = id }, operations);
+        await packagesEndpoint.Patch(new Provider.Packages.Patch.Parameters { Id = id }, operations);
 
         await dbContext.Entry(existingPackage).ReloadAsync();
         var patchedPackage = existingPackage;

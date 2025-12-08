@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Iowa.Databases.App.Migrations
 {
     /// <inheritdoc />
-    public partial class IowaMigration : Migration
+    public partial class IowaReMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -76,7 +76,7 @@ namespace Iowa.Databases.App.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Subcriptions",
+                name: "Subscriptions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -97,7 +97,7 @@ namespace Iowa.Databases.App.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Subcriptions", x => x.Id);
+                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
                 });
         }
 
@@ -114,7 +114,7 @@ namespace Iowa.Databases.App.Migrations
                 name: "Providers");
 
             migrationBuilder.DropTable(
-                name: "Subcriptions");
+                name: "Subscriptions");
         }
     }
 }

@@ -8,7 +8,7 @@ public class IowaContext : DbContext
         : base(options)
     {
     }
-    public DbSet<Tables.Subcription.Table> Subcriptions { get; set; }
+    public DbSet<Tables.Subscription.Table> Subscriptions { get; set; }
     public DbSet<Tables.Package.Table> Packages { get; set; }
     public DbSet<Tables.PaymentHistory.Table> PaymentHistories { get; set; }
     public DbSet<Tables.Provider.Table> Providers { get; set; }

@@ -158,7 +158,7 @@ namespace Iowa.Databases.App.Migrations
                     b.ToTable("Providers");
                 });
 
-            modelBuilder.Entity("Iowa.Databases.App.Tables.Subcription.Table", b =>
+            modelBuilder.Entity("Iowa.Databases.App.Tables.Subscription.Table", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -210,7 +210,7 @@ namespace Iowa.Databases.App.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subcriptions");
+                    b.ToTable("Subscriptions");
                 });
 #pragma warning restore 612, 618
         }
