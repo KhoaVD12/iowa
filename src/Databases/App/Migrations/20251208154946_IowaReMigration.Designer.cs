@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Iowa.Databases.App.Migrations
 {
     [DbContext(typeof(IowaContext))]
-    [Migration("20251203033507_IowaMigration")]
-    partial class IowaMigration
+    [Migration("20251208154946_IowaReMigration")]
+    partial class IowaReMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -161,7 +161,7 @@ namespace Iowa.Databases.App.Migrations
                     b.ToTable("Providers");
                 });
 
-            modelBuilder.Entity("Iowa.Databases.App.Tables.Subcription.Table", b =>
+            modelBuilder.Entity("Iowa.Databases.App.Tables.Subscription.Table", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -213,7 +213,7 @@ namespace Iowa.Databases.App.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subcriptions");
+                    b.ToTable("Subscriptions");
                 });
 #pragma warning restore 612, 618
         }

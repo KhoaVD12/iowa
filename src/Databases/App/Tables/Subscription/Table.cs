@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Iowa.Databases.App.Tables.Subcription;
+namespace Iowa.Databases.App.Tables.Subscription;
 
 public class Table
 {

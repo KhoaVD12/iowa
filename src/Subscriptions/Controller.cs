@@ -1,12 +1,10 @@
 ﻿using Iowa.Databases.App;
 using Iowa.Models.PaginationResults;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Build.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Wolverine;
@@ -31,7 +29,7 @@ public class Controller : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Get([FromQuery] Get.Parameters parameters)
     {
-        var query = _context.Subcriptions.AsQueryable();
+        var query = _context.Subscriptions.AsQueryable();
 
         if (parameters.Id.HasValue)
         {
@@ -66,7 +64,7 @@ public class Controller : ControllerBase
             query = query.Skip(parameters.PageSize.Value * parameters.PageIndex.Value).Take(parameters.PageSize.Value);
 
         var subscriptions = await query.AsNoTracking().ToListAsync();
-        var paginationResults = new Builder<Databases.App.Tables.Subcription.Table>()
+        var paginationResults = new Builder<Databases.App.Tables.Subscription.Table>()
          .WithAll(await query.CountAsync())
          .WithIndex(parameters.PageIndex)
          .WithSize(parameters.PageSize)
@@ -79,7 +77,7 @@ public class Controller : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] Post.Payload payload)
     {
-        var table = new Databases.App.Tables.Subcription.Table
+        var table = new Databases.App.Tables.Subscription.Table
         { };
         var existingPackage = await _context.Packages.FindAsync(payload.PackageId);
 
@@ -108,7 +106,7 @@ public class Controller : ControllerBase
         table.CreatedDate = DateTime.UtcNow;
         table.CreatedById = payload.UserId;
 
-        _context.Subcriptions.Add(table);
+        _context.Subscriptions.Add(table);
         await _context.SaveChangesAsync();
         await _messageBus.PublishAsync(new Post.Messager.Message(table.Id));
         await _hubContext.Clients.All.SendAsync("subscription-created", table.Id);
@@ -117,7 +115,7 @@ public class Controller : ControllerBase
     [HttpPut]
     public async Task<IActionResult> Put([FromBody] Put.Payload payload)
     {
-        var existSubscription = _context.Subcriptions.FirstOrDefault(x => x.Id == payload.Id);
+        var existSubscription = _context.Subscriptions.FirstOrDefault(x => x.Id == payload.Id);
         if (existSubscription == null)
         {
             return NotFound(new ProblemDetails
@@ -153,7 +151,7 @@ public class Controller : ControllerBase
         existSubscription.LastUpdated = DateTime.UtcNow;
         existSubscription.UpdatedById = payload.UserId;
 
-        _context.Subcriptions.Update(existSubscription);
+        _context.Subscriptions.Update(existSubscription);
         await _context.SaveChangesAsync();
         await _messageBus.PublishAsync(new Put.Messager.Message(payload.Id));
         await _hubContext.Clients.All.SendAsync("subscription-updated", payload.Id);
@@ -162,7 +160,7 @@ public class Controller : ControllerBase
 
     [HttpPatch]
     public async Task<IActionResult> Patch([FromQuery] Guid id,
-                                   [FromBody] JsonPatchDocument<Databases.App.Tables.Subcription.Table> patchDoc,
+                                   [FromBody] JsonPatchDocument<Databases.App.Tables.Subscription.Table> patchDoc,
                                    CancellationToken cancellationToken = default!)
     {
         if (User.Identity is null)
@@ -183,7 +181,7 @@ public class Controller : ControllerBase
         if (patchDoc is null)
             return BadRequest("Patch document cannot be null.");
 
-        var entity = await _context.Subcriptions.FindAsync(id, cancellationToken);
+        var entity = await _context.Subscriptions.FindAsync(id, cancellationToken);
         if (entity == null)
             return NotFound(new ProblemDetails
             {
@@ -197,7 +195,7 @@ public class Controller : ControllerBase
 
         entity.LastUpdated = DateTime.UtcNow;
 
-        _context.Subcriptions.Update(entity);
+        _context.Subscriptions.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
         
         
@@ -207,7 +205,7 @@ public class Controller : ControllerBase
     [HttpDelete]
     public async Task<IActionResult> Delete([FromQuery] Delete.Parameters parameters)
     {
-        var table = _context.Subcriptions.FirstOrDefault(x => x.Id == parameters.Id);
+        var table = _context.Subscriptions.FirstOrDefault(x => x.Id == parameters.Id);
         if (table == null)
         {
             return NotFound(new ProblemDetails
@@ -218,7 +216,7 @@ public class Controller : ControllerBase
                 Instance = HttpContext.Request.Path
             });
         }
-        _context.Subcriptions.Remove(table);
+        _context.Subscriptions.Remove(table);
         await _context.SaveChangesAsync();
         await _messageBus.PublishAsync(new Delete.Messager.Message(parameters.Id));
         await _hubContext.Clients.All.SendAsync("subscription-deleted", parameters.Id);

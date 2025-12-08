@@ -9,10 +9,10 @@ public class Handler(IowaContext context)
 
     public async Task Handle(Message message)
     {
-        var existSubscriptions = _context.Subcriptions.Where(x => x.PackageId == message.Id);
+        var existSubscriptions = _context.Subscriptions.Where(x => x.PackageId == message.Id);
         if (existSubscriptions.Any())
         {
-            await _context.Subcriptions.Where(x => x.PackageId == message.Id).ExecuteDeleteAsync();
+            await _context.Subscriptions.Where(x => x.PackageId == message.Id).ExecuteDeleteAsync();
         }
         await _context.SaveChangesAsync();
     }
