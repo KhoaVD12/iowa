@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Provider;
+using Provider.Packages.Patch;
 
 namespace Test.Packages;
 
@@ -259,11 +260,11 @@ public class Test
         await dbContext.SaveChangesAsync();
 
         var packagesEndpoint = serviceProvider!.GetRequiredService<Provider.Packages.IRefitInterface>();
-        var operations = new List<Provider.Packages.Patch.Operation>
+        var operations = new List<Operation>
     {
-        new Provider.Packages.Patch.Operation { op = "replace", path = "/Name", value = "PATCHED PACKAGE NAME" },
-        new Provider.Packages.Patch.Operation { op = "replace", path = "/Description", value = "Patched description" },
-        new Provider.Packages.Patch.Operation { op = "replace", path = "/Price", value = 49.99m }
+        new Operation { op = "replace", path = "/Name", value = "PATCHED PACKAGE NAME" },
+        new Operation { op = "replace", path = "/Description", value = "Patched description" },
+        new Operation { op = "replace", path = "/Price", value = 49.99m }
     };
 
         await packagesEndpoint.Patch(new Provider.Packages.Patch.Parameters { Id = id }, operations);

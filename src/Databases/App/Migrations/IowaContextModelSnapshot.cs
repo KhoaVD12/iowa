@@ -4,19 +4,16 @@ using Iowa.Databases.App;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Iowa.Databases.Migrations
+namespace Iowa.Databases.App.Migrations
 {
     [DbContext(typeof(IowaContext))]
-    [Migration("20251204094116_InitDatabase")]
-    partial class InitDatabase
+    partial class IowaContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -161,7 +158,7 @@ namespace Iowa.Databases.Migrations
                     b.ToTable("Providers");
                 });
 
-            modelBuilder.Entity("Iowa.Databases.App.Tables.Subcription.Table", b =>
+            modelBuilder.Entity("Iowa.Databases.App.Tables.Subscription.Table", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -213,7 +210,7 @@ namespace Iowa.Databases.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subcriptions");
+                    b.ToTable("Subscriptions");
                 });
 #pragma warning restore 612, 618
         }

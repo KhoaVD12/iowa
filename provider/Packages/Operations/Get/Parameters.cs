@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Provider.Packages.Get;
+﻿namespace Provider.Packages.Get;
 
 public class Parameters
 {

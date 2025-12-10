@@ -5,7 +5,7 @@ namespace Provider.Packages;
 
 public static class Extensions
 {
-    public static void RegisterSubscriptions(this IServiceCollection services, Config config)
+    public static void RegisterPackages(this IServiceCollection services, Config config)
     {
         services.AddTransient<RefitHttpClientHandler>();
 

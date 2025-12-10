@@ -1,6 +1,4 @@
 namespace Iowa.Discounts.Delete.Messager
 {
-    public record Message
-    {
-    }
+    public record Message(Guid Id);
 }

@@ -1,4 +1,13 @@
 using Iowa.Databases.App;
+using Azure;
+using Iowa.Databases.App.Tables.Discount;
+using Iowa.Models.PaginationResults;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Wolverine;
@@ -9,10 +18,14 @@ public class Controller : ControllerBase
 {
     private readonly IowaContext _context;
     private readonly IMessageBus _messageBus;
-    public Controller(IowaContext context, IMessageBus messageBus)
+    private readonly ILogger<Controller> _logger;
+    private readonly IHubContext<Hub> _hubContext;
+    public Controller(IowaContext context, IMessageBus messageBus, ILogger<Controller> logger, IHubContext<Hub> hubContext)
     {
         _context = context;
         _messageBus = messageBus;
+        _logger = logger;
+        _hubContext = hubContext;
     }
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery] Discounts.Get.Parameters parameters)
@@ -115,4 +128,20 @@ public class Controller : ControllerBase
         await _context.SaveChangesAsync();
         return NoContent();
     }
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> Patch([FromQuery]Guid id, [FromBody] JsonPatchDocument<Table> patchDoc,
+                                    CancellationToken cancellationToken = default!)
+    {
+        var table = await _context.Discounts.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        if (table == null)
+        {
+            return NotFound();
+        }
+
+        patchDoc.ApplyTo(table);
+        _context.Discounts.Update(table);
+        await _context.SaveChangesAsync(cancellationToken);
+        return NoContent();
+    }
+        
 }
