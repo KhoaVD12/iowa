@@ -28,7 +28,7 @@ public class Test
     #region [ Endpoints ]
 
     [Fact]
-    public async Task GET_DataExist()
+    public async Task GET_Provider()
     {
         var dbContext = serviceProvider!.GetRequiredService<IowaContext>();
         var provider = new Iowa.Databases.App.Tables.Provider.Table
@@ -39,17 +39,21 @@ public class Test
             IconUrl = "https://example.com/provider.png",
             WebsiteUrl = "https://example.com",
             CreatedDate = DateTime.UtcNow,
-            LastUpdated = DateTime.UtcNow
+            LastUpdated = DateTime.UtcNow,
+            CreatedById = Guid.NewGuid()
         };
         dbContext.Providers.Add(provider);
         await dbContext.SaveChangesAsync();
-        var exercisesEndpoint = serviceProvider!.GetRequiredService<Provider.Providers.IRefitInterface>();
-        var result = await exercisesEndpoint.Get(new()
+        var providerEndpoint = serviceProvider!.GetRequiredService<Provider.Providers.IRefitInterface>();
+        var getParameters = new Provider.Providers.Get.Parameters
+        {
+            Id = provider.Id
+        };
+        var result = await providerEndpoint.Get(new()
         {
         });
         var items = result?.Content?.Items;
 
-        Assert.NotNull(result);
         Assert.NotNull(result);
         Assert.NotNull(result.Content);
         Assert.True(items.Count > 0, "Expected at least one exercise in result.");
