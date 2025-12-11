@@ -254,4 +254,46 @@ public class Test
         context.Subscriptions.Remove(subscription);
         await context.SaveChangesAsync();
     }
+    [Fact]
+    //PATCH
+    public async Task PATCH_Subscription()
+    {
+        var context = serviceProvider.GetRequiredService<IowaContext>();
+        var subscription = new Iowa.Databases.App.Tables.Subscription.Table
+        {
+            Id = Guid.NewGuid(),
+            UserId = Guid.NewGuid(),
+            ProviderId = Guid.NewGuid(),
+            PackageId = Guid.NewGuid(),
+            Price = 9.99m,
+            DiscountedPrice = null,
+            Currency = "USD",
+            RenewalDate = DateTime.UtcNow.AddMonths(1),
+            Status = "Active",
+            ChartColor = "#FF0000",
+            CreatedDate = DateTime.UtcNow,
+            CreatedById = Guid.NewGuid()
+        };
+        context.Subscriptions.Add(subscription);
+        await context.SaveChangesAsync();
+
+        Guid newUserId= Guid.NewGuid();
+        decimal newPrice= 49.99m;
+
+        var subscriptionEndpoint = serviceProvider!.GetRequiredService<Provider.Subscriptions.IRefitInterface>();
+        var operations = new List<Provider.Subscriptions.Patch.Operation>
+    {
+        new Provider.Subscriptions.Patch.Operation { op = "replace", path = "/UserId", value = newUserId },
+        new Provider.Subscriptions.Patch.Operation { op = "replace", path = "/Price", value = newPrice }
+    };
+        var result = await subscriptionEndpoint.Patch(new Provider.Subscriptions.Patch.Parameters {Id=subscription.Id }, operations);
+        await context.Entry(subscription).ReloadAsync();
+        Assert.NotNull(result);
+        Assert.True(result.IsSuccessStatusCode);
+        var patchedSubscription = await context.Subscriptions.FindAsync(subscription.Id);
+        Assert.Equal(newPrice, patchedSubscription?.Price);
+        Assert.Equal(newUserId, patchedSubscription?.UserId);
+        context.Subscriptions.Remove(subscription);
+        await context.SaveChangesAsync();
+    }
 }
