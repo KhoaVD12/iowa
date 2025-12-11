@@ -88,7 +88,6 @@ public class Test
         await context.SaveChangesAsync();
     }
     [Fact]
-    //GET test
     public async Task GET_Subscriptions()
     {
         var context = serviceProvider.GetRequiredService<IowaContext>();
@@ -114,10 +113,145 @@ public class Test
         {
             Id= subscription.Id,
         };
-        var result = await subscriptionEndpoint.Get(getParameters);
+        var result = await subscriptionEndpoint.Get(new()
+        {
+            
+        });
         Assert.NotNull(result);
         Assert.True(result.IsSuccessStatusCode);
         Assert.NotNull(result.Content);
-        Assert.True(result.Content?.Items?.Count <= 10);
+        Assert.NotEqual(0, result.Content?.Items?.Count);
+    }
+    [Fact]
+    public async Task POST_Subscription()
+    {
+        var context = serviceProvider.GetRequiredService<IowaContext>();
+        var provider = new Iowa.Databases.App.Tables.Provider.Table
+        {
+            Id = Guid.NewGuid(),
+            Name = "TEST PROVIDER",
+            Description = "Provider for POST test",
+            IconUrl = "https://example.com/provider.png",
+            WebsiteUrl = "https://example.com",
+            CreatedDate = DateTime.UtcNow,
+            LastUpdated = DateTime.UtcNow,
+            CreatedById = Guid.NewGuid()
+        };
+        var package = new Iowa.Databases.App.Tables.Package.Table
+        {
+            Id = Guid.NewGuid(),
+            ProviderId = provider.Id,
+            Name = "TEST PACKAGE",
+            Description = "A basic TEST PACKAGE for testing purposes.",
+            IconUrl = "https://example.com/icon.png",
+            Price = 9.99m,
+            Currency = "USD",
+            CreatedDate = DateTime.UtcNow,
+            LastUpdated = DateTime.UtcNow
+        };
+        context.Providers.Add(provider);
+        context.Packages.Add(package);
+        await context.SaveChangesAsync();
+        var subscriptionEndpoint = serviceProvider!.GetRequiredService<Provider.Subscriptions.IRefitInterface>();
+        var subscription = new Provider.Subscriptions.Post.Payload
+        {
+            UserId = Guid.NewGuid(),
+            ProviderId = provider.Id,
+            PackageId = package.Id,
+            Price = 9.99m,
+            Currency = "USD",
+            RenewalDate = DateTime.UtcNow.AddMonths(1),
+            ChartColor = "#00FF00",
+        };
+        var result = await subscriptionEndpoint.Post(subscription);
+        Assert.NotNull(result);
+        Assert.True(result.IsSuccessStatusCode);
+        Assert.NotNull(result.Content);
+        var createdSubscription = await context.Subscriptions.FirstOrDefaultAsync(p=>p.UserId== subscription.UserId);
+        Assert.Equal(subscription.UserId, createdSubscription?.UserId);
+        Assert.Equal(subscription.ProviderId, createdSubscription?.ProviderId);
+        Assert.Equal(subscription.PackageId, createdSubscription?.PackageId);
+        Assert.Equal(subscription.Price, createdSubscription?.Price);
+        Assert.Equal(subscription.Currency, createdSubscription?.Currency);
+        Assert.Equal(subscription.RenewalDate, createdSubscription?.RenewalDate);
+        context.Providers.Remove(provider);
+        context.Packages.Remove(package);
+        if (createdSubscription != null)
+        {
+            context.Subscriptions.Remove(createdSubscription);
+        }
+        await context.SaveChangesAsync();
+    }
+    [Fact]
+    public async Task PUT_Subscription()
+    {
+        var context = serviceProvider.GetRequiredService<IowaContext>();
+        var oldUserId = Guid.NewGuid();
+        var newUserId = Guid.NewGuid();
+        var provider = new Iowa.Databases.App.Tables.Provider.Table
+        {
+            Id = Guid.NewGuid(),
+            Name = "TEST PROVIDER",
+            Description = "Provider for POST test",
+            IconUrl = "https://example.com/provider.png",
+            WebsiteUrl = "https://example.com",
+            CreatedDate = DateTime.UtcNow,
+            LastUpdated = DateTime.UtcNow,
+            CreatedById = Guid.NewGuid()
+        };
+        var package = new Iowa.Databases.App.Tables.Package.Table
+        {
+            Id = Guid.NewGuid(),
+            ProviderId = provider.Id,
+            Name = "TEST PACKAGE",
+            Description = "A basic TEST PACKAGE for testing purposes.",
+            IconUrl = "https://example.com/icon.png",
+            Price = 9.99m,
+            Currency = "USD",
+            CreatedDate = DateTime.UtcNow,
+            LastUpdated = DateTime.UtcNow
+        };
+        Guid subscriptionId= Guid.NewGuid();
+        var subscription = new Iowa.Databases.App.Tables.Subscription.Table
+        {
+            Id = subscriptionId,
+            UserId = oldUserId,
+            ProviderId = provider.Id,
+            PackageId = package.Id,
+            Price = 9.99m,
+            DiscountedPrice = null,
+            Currency = "USD",
+            RenewalDate = DateTime.UtcNow.AddMonths(1),
+            Status = "Active",
+            ChartColor = "#FF0000",
+            CreatedDate = DateTime.UtcNow,
+            CreatedById = Guid.NewGuid()
+        };
+        context.Packages.Add(package);
+        context.Providers.Add(provider);
+        context.Subscriptions.Add(subscription);
+        await context.SaveChangesAsync();
+        var subscriptionEndpoint = serviceProvider!.GetRequiredService<Provider.Subscriptions.IRefitInterface>();
+        var updatedPayload = new Provider.Subscriptions.Put.Payload
+        {
+            Id = subscription.Id,
+            UserId = newUserId,
+            ProviderId = subscription.ProviderId,
+            PackageId = subscription.PackageId,
+            Price = 19.99m,
+            Currency = "USD",
+            ChartColor = "#0000FF",
+            RenewalDate = DateTime.UtcNow.AddMonths(2),
+        };
+        var result = await subscriptionEndpoint.Put(updatedPayload);
+        await context.Entry(subscription).ReloadAsync();
+        Assert.NotNull(result);
+        Assert.True(result.IsSuccessStatusCode);
+        var updatedSubscription = await context.Subscriptions.FindAsync(subscriptionId);
+        Assert.Equal(updatedPayload.Price, updatedSubscription?.Price);
+        Assert.Equal(updatedPayload.UserId, updatedSubscription?.UserId);
+        Assert.Equal(updatedPayload.RenewalDate, updatedSubscription?.RenewalDate);
+        context.Subscriptions.Remove(subscription);
+        await context.SaveChangesAsync();
     }
 }
