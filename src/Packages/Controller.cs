@@ -183,12 +183,12 @@ public class Controller : ControllerBase
                                        [FromBody] JsonPatchDocument<Table> patchDoc,
                                        CancellationToken cancellationToken = default!)
     {
-        if (User.Identity is null)
-            return Unauthorized();
+        //if (User.Identity is null)
+        //    return Unauthorized();
 
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userId is null)
-            return Unauthorized("User Id not found");
+        //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //if (userId is null)
+        //    return Unauthorized("User Id not found");
         var changes = new List<(string Path, object? Value)>();
 
         foreach (var op in patchDoc.Operations)
