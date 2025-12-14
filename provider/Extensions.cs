@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Provider.Packages;
+using Provider.PaymentHistories;
 using Provider.Providers;
 using Provider.Subscriptions;
 
@@ -14,6 +15,7 @@ public static class Extensions
         services.RegisterPackages(config);
         services.RegisterSubscriptions(config);
         services.RegisterProviders(config);
+        services.RegisterPaymentHistories(config);
         return services;
     }
 }
