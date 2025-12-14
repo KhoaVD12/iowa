@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Provider.Packages;
 using Provider.Providers;
+using Provider.SubscriptionBySubcriptionPlan;
 using Provider.Subscriptions;
 using Provider.Discounts;
 
@@ -16,6 +17,8 @@ public static class Extensions
         services.RegisterSubscriptions(config);
         services.RegisterProviders(config);
         services.RegisterDiscounts(config);
+        services.RegisterSubscriptionBySubscriptionPlan(config);
+
         return services;
     }
 }
