@@ -9,4 +9,5 @@ public class Payload
     public string Currency { get; set; } = string.Empty;
     public string ChartColor { get; set; } = string.Empty;
     public DateTime RenewalDate { get; set; }
+    public bool Status { get; set; }
 }

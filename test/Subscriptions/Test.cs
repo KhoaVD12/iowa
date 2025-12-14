@@ -18,7 +18,7 @@ public class Test
                     secretKey: "secretKey"
                 );
         var services = new ServiceCollection();
-        services.AddEndpoints(providerConfig);
+        services.AddProviders(providerConfig);
         services.AddDbContext<IowaContext>(options =>
                 options.UseSqlServer("Server=localhost;Database=Iowa;Trusted_Connection=True;TrustServerCertificate=True"));
         this.serviceProvider = services.BuildServiceProvider();
@@ -61,7 +61,7 @@ public class Test
             DiscountedPrice = null,
             Currency = "USD",
             RenewalDate = DateTime.UtcNow.AddMonths(1),
-            Status = "Active",
+            Status = true,
             ChartColor = "#FF0000",
             CreatedDate = DateTime.UtcNow,
             CreatedById = Guid.NewGuid()
@@ -77,7 +77,7 @@ public class Test
         {
             Id = subscription.Id,
         };
-        var result = await subscriptionEndpoint.Delete(deleteParameters);
+        var result = await subscriptionEndpoint.DeleteAsync(deleteParameters);
 
         await context.Entry(subscription).ReloadAsync();
         var deletedSubscription = await context.Packages.FindAsync(subscription.Id);
@@ -101,7 +101,7 @@ public class Test
             DiscountedPrice = null,
             Currency = "USD",
             RenewalDate = DateTime.UtcNow.AddMonths(1),
-            Status = "Active",
+            Status = true,
             ChartColor = "#FF0000",
             CreatedDate = DateTime.UtcNow,
             CreatedById = Guid.NewGuid()
@@ -109,11 +109,7 @@ public class Test
         context.Subscriptions.Add(subscription);
         await context.SaveChangesAsync();
         var subscriptionEndpoint = serviceProvider!.GetRequiredService<Provider.Subscriptions.IRefitInterface>();
-        var getParameters = new Provider.Subscriptions.Get.Parameters
-        {
-            Id= subscription.Id,
-        };
-        var result = await subscriptionEndpoint.Get(new()
+        var result = await subscriptionEndpoint.GetAsync(new()
         {
             
         });
@@ -162,8 +158,9 @@ public class Test
             Currency = "USD",
             RenewalDate = DateTime.UtcNow.AddMonths(1),
             ChartColor = "#00FF00",
+            Status = true
         };
-        var result = await subscriptionEndpoint.Post(subscription);
+        var result = await subscriptionEndpoint.PostAsync(subscription);
         Assert.NotNull(result);
         Assert.True(result.IsSuccessStatusCode);
         Assert.NotNull(result.Content);
@@ -222,7 +219,7 @@ public class Test
             DiscountedPrice = null,
             Currency = "USD",
             RenewalDate = DateTime.UtcNow.AddMonths(1),
-            Status = "Active",
+            Status = true,
             ChartColor = "#FF0000",
             CreatedDate = DateTime.UtcNow,
             CreatedById = Guid.NewGuid()
@@ -242,8 +239,9 @@ public class Test
             Currency = "USD",
             ChartColor = "#0000FF",
             RenewalDate = DateTime.UtcNow.AddMonths(2),
+            Status = false
         };
-        var result = await subscriptionEndpoint.Put(updatedPayload);
+        var result = await subscriptionEndpoint.PutAsync(updatedPayload);
         await context.Entry(subscription).ReloadAsync();
         Assert.NotNull(result);
         Assert.True(result.IsSuccessStatusCode);
@@ -269,7 +267,7 @@ public class Test
             DiscountedPrice = null,
             Currency = "USD",
             RenewalDate = DateTime.UtcNow.AddMonths(1),
-            Status = "Active",
+            Status = true,
             ChartColor = "#FF0000",
             CreatedDate = DateTime.UtcNow,
             CreatedById = Guid.NewGuid()
@@ -286,7 +284,7 @@ public class Test
         new Provider.Subscriptions.Patch.Operation { op = "replace", path = "/UserId", value = newUserId },
         new Provider.Subscriptions.Patch.Operation { op = "replace", path = "/Price", value = newPrice }
     };
-        var result = await subscriptionEndpoint.Patch(new Provider.Subscriptions.Patch.Parameters {Id=subscription.Id }, operations);
+        var result = await subscriptionEndpoint.PatchAsync(new Provider.Subscriptions.Patch.Parameters {Id=subscription.Id }, operations);
         await context.Entry(subscription).ReloadAsync();
         Assert.NotNull(result);
         Assert.True(result.IsSuccessStatusCode);

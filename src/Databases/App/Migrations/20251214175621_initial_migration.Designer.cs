@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Iowa.Databases.App.Migrations
 {
     [DbContext(typeof(IowaContext))]
-    [Migration("20251208154946_IowaReMigration")]
-    partial class IowaReMigration
+    [Migration("20251214175621_initial_migration")]
+    partial class initial_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -202,8 +202,8 @@ namespace Iowa.Databases.App.Migrations
                     b.Property<DateTime>("RenewalDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
