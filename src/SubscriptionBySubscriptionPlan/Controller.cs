@@ -75,6 +75,6 @@ public class Controller : ControllerBase
             CompanyId = null
         };
         await _tempContext.SubscriptionBySubscriptionPlans.Insert(newRecord).ExecuteAsync();
-        return CreatedAtAction(nameof(Get), new { id = newRecord.Id }, newRecord);
+        return CreatedAtAction(nameof(Get), new { id = newRecord.Id });
     }
 }

@@ -8,7 +8,7 @@ namespace Provider.SubscriptionBySubcriptionPlan;
 public interface IRefitInterface
 {
     [Get("/api/subscription_by_subscriptionPlan")]
-    Task<ApiResponse<Models.PaginationResults.Model<Model>>> Get([Query] Get.Parameters parameters);
+    Task<ApiResponse<Model>> Get([Query] Get.Parameters parameters);
 
     [Post("/api/subscription_by_subscriptionPlan")]
     Task<ApiResponse<object>> Post([Body] Post.Payload payload);
