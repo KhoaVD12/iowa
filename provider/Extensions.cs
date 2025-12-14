@@ -3,7 +3,6 @@ using Provider.Packages;
 using Provider.Providers;
 using Provider.SubscriptionBySubcriptionPlan;
 using Provider.Subscriptions;
-using Provider.Discounts;
 
 namespace Provider;
 
@@ -16,9 +15,7 @@ public static class Extensions
         services.RegisterPackages(config);
         services.RegisterSubscriptions(config);
         services.RegisterProviders(config);
-        services.RegisterDiscounts(config);
         services.RegisterSubscriptionBySubscriptionPlan(config);
-
         return services;
     }
 }
