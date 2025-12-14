@@ -12,5 +12,4 @@ public class IowaContext : DbContext
     public DbSet<Tables.Package.Table> Packages { get; set; }
     public DbSet<Tables.PaymentHistory.Table> PaymentHistories { get; set; }
     public DbSet<Tables.Provider.Table> Providers { get; set; }
-    public DbSet<Tables.Discount.Table> Discounts { get; set; }
 }
