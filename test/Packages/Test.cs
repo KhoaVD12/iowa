@@ -55,7 +55,7 @@ public class Test
         Assert.NotNull(result);
         Assert.NotNull(result);
         Assert.NotNull(result.Content);
-        Assert.True(items.Count > 0, "Expected at least one exercise in result.");
+        Assert.True(items?.Count > 0, "Expected at least one exercise in result.");
         Assert.Contains(items, p => p.Id == package.Id);
         dbContext.Packages.Remove(package);
         await dbContext.SaveChangesAsync();
