@@ -55,13 +55,12 @@ public class Test
         {
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
-            ProviderId = provider.Id,
+            PurchasedDate = DateTime.UtcNow,
             PackageId = package.Id,
             Price = 9.99m,
             DiscountedPrice = null,
             Currency = "USD",
             RenewalDate = DateTime.UtcNow.AddMonths(1),
-            Status = true,
             ChartColor = "#FF0000",
             CreatedDate = DateTime.UtcNow,
             CreatedById = Guid.NewGuid(),
@@ -96,13 +95,12 @@ public class Test
         {
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
-            ProviderId = Guid.NewGuid(),
+            PurchasedDate = DateTime.UtcNow,
             PackageId = Guid.NewGuid(),
             Price = 9.99m,
             DiscountedPrice = null,
             Currency = "USD",
             RenewalDate = DateTime.UtcNow.AddMonths(1),
-            Status = true,
             ChartColor = "#FF0000",
             CreatedDate = DateTime.UtcNow,
             CreatedById = Guid.NewGuid(),
@@ -154,13 +152,12 @@ public class Test
         var subscription = new Provider.Subscriptions.Post.Payload
         {
             UserId = Guid.NewGuid(),
-            ProviderId = provider.Id,
+            PurchasedDate= DateTime.UtcNow,
             PackageId = package.Id,
             Price = 9.99m,
             Currency = "USD",
             RenewalDate = DateTime.UtcNow.AddMonths(1),
             ChartColor = "#00FF00",
-            Status = true,
             IsRecursive = true
         };
         var result = await subscriptionEndpoint.PostAsync(subscription);
@@ -169,7 +166,6 @@ public class Test
         Assert.NotNull(result.Content);
         var createdSubscription = await context.Subscriptions.FirstOrDefaultAsync(p=>p.UserId== subscription.UserId);
         Assert.Equal(subscription.UserId, createdSubscription?.UserId);
-        Assert.Equal(subscription.ProviderId, createdSubscription?.ProviderId);
         Assert.Equal(subscription.PackageId, createdSubscription?.PackageId);
         Assert.Equal(subscription.Price, createdSubscription?.Price);
         Assert.Equal(subscription.Currency, createdSubscription?.Currency);
@@ -216,13 +212,12 @@ public class Test
         {
             Id = subscriptionId,
             UserId = oldUserId,
-            ProviderId = provider.Id,
+            PurchasedDate = DateTime.UtcNow,
             PackageId = package.Id,
             Price = 9.99m,
             DiscountedPrice = null,
             Currency = "USD",
             RenewalDate = DateTime.UtcNow.AddMonths(1),
-            Status = true,
             ChartColor = "#FF0000",
             CreatedDate = DateTime.UtcNow,
             CreatedById = Guid.NewGuid(),
@@ -237,13 +232,11 @@ public class Test
         {
             Id = subscription.Id,
             UserId = newUserId,
-            ProviderId = subscription.ProviderId,
             PackageId = subscription.PackageId,
             Price = 19.99m,
             Currency = "USD",
             ChartColor = "#0000FF",
             RenewalDate = DateTime.UtcNow.AddMonths(2),
-            Status = false,
             IsRecursive = false
         };
         var result = await subscriptionEndpoint.PutAsync(updatedPayload);
@@ -268,13 +261,12 @@ public class Test
         {
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
-            ProviderId = Guid.NewGuid(),
+            PurchasedDate = DateTime.UtcNow,
             PackageId = Guid.NewGuid(),
             Price = 9.99m,
             DiscountedPrice = null,
             Currency = "USD",
             RenewalDate = DateTime.UtcNow.AddMonths(1),
-            Status = true,
             ChartColor = "#FF0000",
             CreatedDate = DateTime.UtcNow,
             CreatedById = Guid.NewGuid(),

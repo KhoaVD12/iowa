@@ -39,9 +39,9 @@ public class Controller : ControllerBase
         {
             query = query.Where(x => x.UserId == parameters.UserId.Value);
         }
-        if (parameters.ProviderId.HasValue)
+        if (parameters.PurchasedDate.HasValue)
         {
-            query = query.Where(x => x.ProviderId == parameters.ProviderId.Value);
+            query = query.Where(x => x.PurchasedDate.Date == parameters.PurchasedDate.Value.Date);
         }
         if (parameters.PackageId.HasValue)
         {
@@ -51,15 +51,11 @@ public class Controller : ControllerBase
         {
             query = query.Where(x => x.Currency == parameters.Currency);
         }
-        if (parameters.Status.HasValue)
-        {
-            query = query.Where(x => x.Status == parameters.Status);
-        }
         if (!string.IsNullOrEmpty(parameters.ChartColor))
         {
             query = query.Where(x => x.ChartColor == parameters.ChartColor);
         }
-        if (parameters.IsRecursive.HasValue)
+        if (parameters.IsRecursive==true)
         {
             query = query.Where(x => x.IsRecursive == parameters.IsRecursive);
         }
@@ -80,8 +76,7 @@ public class Controller : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] Post.Payload payload)
     {
-        var table = new Databases.App.Tables.Subscription.Table
-        { };
+        
         var existingPackage = await _context.Packages.FindAsync(payload.PackageId);
 
         if (existingPackage is null)
@@ -94,22 +89,23 @@ public class Controller : ControllerBase
                 Instance = HttpContext.Request.Path
             });
         }
-
-        table.Id = Guid.NewGuid();
-        table.UserId = payload.UserId;
-        table.ProviderId = payload.ProviderId;
-        table.PackageId = payload.PackageId;
-        table.Price =  payload.Price;
-        table.DiscountedPrice = payload.DiscountedPrice;
-        table.Currency = payload.Currency;
-        table.ChartColor = payload.ChartColor;
-        table.DiscountId = payload.DiscountId;
-        table.RenewalDate = payload.RenewalDate;
-        table.Status = payload.Status;
-        table.CreatedDate = DateTime.UtcNow;
-        table.CreatedById = payload.UserId;
-        table.IsRecursive = payload.IsRecursive;
-
+        var table = new Databases.App.Tables.Subscription.Table
+        {
+            Id = Guid.NewGuid(),
+            UserId = payload.UserId,
+            PurchasedDate = payload.PurchasedDate,
+            PackageId = payload.PackageId,
+            Price = payload.Price,
+            DiscountedPrice = payload.DiscountedPrice,
+            Currency = payload.Currency,
+            ChartColor = payload.ChartColor,
+            DiscountId = payload.DiscountId,
+            RenewalDate = payload.RenewalDate,
+            CreatedDate = DateTime.UtcNow,
+            CreatedById = payload.UserId,
+            IsRecursive = payload.IsRecursive
+        };
+        
         _context.Subscriptions.Add(table);
         await _context.SaveChangesAsync();
         await _messageBus.PublishAsync(new Post.Messager.Message(table.Id));
@@ -144,7 +140,7 @@ public class Controller : ControllerBase
         }
 
         existSubscription.UserId = payload.UserId;
-        existSubscription.ProviderId = payload.ProviderId;
+        existSubscription.PurchasedDate = payload.PurchasedDate;
         existSubscription.PackageId = payload.PackageId;
         existSubscription.Price =  payload.Price;
         existSubscription.DiscountedPrice = payload.DiscountedPrice;
@@ -154,7 +150,6 @@ public class Controller : ControllerBase
         existSubscription.RenewalDate = payload.RenewalDate;
         existSubscription.LastUpdated = DateTime.UtcNow;
         existSubscription.UpdatedById = payload.UserId;
-        existSubscription.Status = payload.Status;
         existSubscription.IsRecursive = payload.IsRecursive;
 
         _context.Subscriptions.Update(existSubscription);
@@ -169,19 +164,10 @@ public class Controller : ControllerBase
                                    [FromBody] JsonPatchDocument<Databases.App.Tables.Subscription.Table> patchDoc,
                                    CancellationToken cancellationToken = default!)
     {
-        //if (User.Identity is null)
-        //    return Unauthorized();
-
-        //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //if (userId is null)
-        //    return Unauthorized("User Id not found");
-
-        var changes = new List<(string Path, object? Value)>();
         foreach (var op in patchDoc.Operations)
         {
             if (op.OperationType != OperationType.Replace && op.OperationType != OperationType.Test)
                 return BadRequest("Only Replace and Test operations are allowed in this patch request.");
-            changes.Add((op.path, op.value));
         }
 
         if (patchDoc is null)
@@ -203,8 +189,6 @@ public class Controller : ControllerBase
 
         _context.Subscriptions.Update(entity);
         await _context.SaveChangesAsync(cancellationToken);
-        
-        
         return NoContent();
     }
 

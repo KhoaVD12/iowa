@@ -193,14 +193,11 @@ namespace Iowa.Databases.App.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("ProviderId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<DateTime>("PurchasedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("RenewalDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
 
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
