@@ -64,7 +64,8 @@ public class Test
             Status = true,
             ChartColor = "#FF0000",
             CreatedDate = DateTime.UtcNow,
-            CreatedById = Guid.NewGuid()
+            CreatedById = Guid.NewGuid(),
+            IsRecursive = true
         };
         context.Providers.Add(provider);
         context.Packages.Add(package);
@@ -104,7 +105,8 @@ public class Test
             Status = true,
             ChartColor = "#FF0000",
             CreatedDate = DateTime.UtcNow,
-            CreatedById = Guid.NewGuid()
+            CreatedById = Guid.NewGuid(),
+            IsRecursive = true
         };
         context.Subscriptions.Add(subscription);
         await context.SaveChangesAsync();
@@ -158,7 +160,8 @@ public class Test
             Currency = "USD",
             RenewalDate = DateTime.UtcNow.AddMonths(1),
             ChartColor = "#00FF00",
-            Status = true
+            Status = true,
+            IsRecursive = true
         };
         var result = await subscriptionEndpoint.PostAsync(subscription);
         Assert.NotNull(result);
@@ -222,7 +225,8 @@ public class Test
             Status = true,
             ChartColor = "#FF0000",
             CreatedDate = DateTime.UtcNow,
-            CreatedById = Guid.NewGuid()
+            CreatedById = Guid.NewGuid(),
+            IsRecursive = true
         };
         context.Packages.Add(package);
         context.Providers.Add(provider);
@@ -239,7 +243,8 @@ public class Test
             Currency = "USD",
             ChartColor = "#0000FF",
             RenewalDate = DateTime.UtcNow.AddMonths(2),
-            Status = false
+            Status = false,
+            IsRecursive = false
         };
         var result = await subscriptionEndpoint.PutAsync(updatedPayload);
         await context.Entry(subscription).ReloadAsync();
@@ -250,6 +255,8 @@ public class Test
         Assert.Equal(updatedPayload.UserId, updatedSubscription?.UserId);
         Assert.Equal(updatedPayload.RenewalDate, updatedSubscription?.RenewalDate);
         context.Subscriptions.Remove(subscription);
+        context.Packages.Remove(package);
+        context.Providers.Remove(provider);
         await context.SaveChangesAsync();
     }
     [Fact]
@@ -270,7 +277,8 @@ public class Test
             Status = true,
             ChartColor = "#FF0000",
             CreatedDate = DateTime.UtcNow,
-            CreatedById = Guid.NewGuid()
+            CreatedById = Guid.NewGuid(),
+            IsRecursive = true
         };
         context.Subscriptions.Add(subscription);
         await context.SaveChangesAsync();

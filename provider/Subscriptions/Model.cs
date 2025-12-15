@@ -21,4 +21,6 @@ public class Model
     public Guid CreatedById { get; set; }
     public DateTime? LastUpdated { get; set; }
     public Guid? UpdatedById { get; set; }
+
+    public bool IsRecursive { get; set; }
 }

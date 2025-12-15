@@ -15,4 +15,5 @@ public class Payload
     public bool Status { get; set; }
     public Guid DiscountId { get; set; }
     public DateTime RenewalDate { get; set; }
+    public bool IsRecursive { get; set; }
 }

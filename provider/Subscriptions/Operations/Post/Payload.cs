@@ -10,4 +10,5 @@ public class Payload
     public string ChartColor { get; set; } = string.Empty;
     public DateTime RenewalDate { get; set; }
     public bool Status { get; set; }
+    public bool IsRecursive { get; set; }
 }
