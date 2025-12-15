@@ -11,4 +11,5 @@ public class Parameters
     public bool? Status { get; set; }
     public int? PageIndex { get; set; }
     public int? PageSize { get; set; }
+    public bool? IsRecursive { get; set; }
 }

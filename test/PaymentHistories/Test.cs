@@ -19,7 +19,7 @@ public class Test
                     secretKey: "secretKey"
                 );
         var services = new ServiceCollection();
-        services.AddEndpoints(providerConfig);
+        services.AddProviders(providerConfig);
         services.AddDbContext<IowaContext>(options =>
                 options.UseSqlServer("Server=localhost;Database=Iowa;Trusted_Connection=True;TrustServerCertificate=True"));
         this.serviceProvider = services.BuildServiceProvider();
@@ -44,7 +44,7 @@ public class Test
         dbContext.PaymentHistories.Add(paymentHistory); // <-- Correct: add to PaymentHistories DbSet
         await dbContext.SaveChangesAsync();
         var paymentHistoriesEndpoint = serviceProvider!.GetRequiredService<Provider.PaymentHistories.IRefitInterface>();
-        var result = await paymentHistoriesEndpoint.Get(new()
+        var result = await paymentHistoriesEndpoint.GetAsync(new()
         {
         });
         var items = result?.Content.Items;
@@ -94,7 +94,7 @@ public class Test
             Currency = "USD"
         };
 
-        await PaymentHistoriesEndpoint.Post(payload);
+        await PaymentHistoriesEndpoint.PostAsync(payload);
 
         var expected = await dbContext.PaymentHistories.FirstOrDefaultAsync(p => p.UserId == payload.UserId);
         Assert.NotNull(expected);
@@ -158,7 +158,7 @@ public class Test
             Currency = "VND"
         };
 
-        await endpoint.Put(payload);
+        await endpoint.PutAsync(payload);
 
         await dbContext.Entry(paymentHistory).ReloadAsync();
 
@@ -196,7 +196,7 @@ public class Test
         await dbContext.SaveChangesAsync();
 
         var endpoint = serviceProvider!.GetRequiredService<Provider.PaymentHistories.IRefitInterface>();
-        await endpoint.Delete(new Provider.PaymentHistories.Delete.Parameters { Id = paymentHistory.Id });
+        await endpoint.DeleteAsync(new Provider.PaymentHistories.Delete.Parameters { Id = paymentHistory.Id });
         await dbContext.Entry(paymentHistory).ReloadAsync();
         var deleted = await dbContext.PaymentHistories.FindAsync(paymentHistory.Id);
         Assert.Null(deleted);
@@ -253,7 +253,7 @@ public class Test
         new Operation { op = "replace", path = "/Price", value = 49.99m }
     };
 
-        await endpoint.Patch(
+        await endpoint.PatchAsync(
             new Provider.PaymentHistories.Patch.Parameters
             {
                 Id = paymentHistory.Id

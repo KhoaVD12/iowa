@@ -59,7 +59,10 @@ public class Controller : ControllerBase
         {
             query = query.Where(x => x.ChartColor == parameters.ChartColor);
         }
-        query = query.OrderByDescending(x => x.CreatedDate);
+        if (parameters.IsRecursive.HasValue)
+        {
+            query = query.Where(x => x.IsRecursive == parameters.IsRecursive);
+        }
         if (parameters.PageSize.HasValue && parameters.PageIndex.HasValue && parameters.PageSize > 0 && parameters.PageIndex.Value >= 0)
             query = query.Skip(parameters.PageSize.Value * parameters.PageIndex.Value).Take(parameters.PageSize.Value);
 
@@ -105,6 +108,7 @@ public class Controller : ControllerBase
         table.Status = payload.Status;
         table.CreatedDate = DateTime.UtcNow;
         table.CreatedById = payload.UserId;
+        table.IsRecursive = payload.IsRecursive;
 
         _context.Subscriptions.Add(table);
         await _context.SaveChangesAsync();
@@ -151,6 +155,7 @@ public class Controller : ControllerBase
         existSubscription.LastUpdated = DateTime.UtcNow;
         existSubscription.UpdatedById = payload.UserId;
         existSubscription.Status = payload.Status;
+        existSubscription.IsRecursive = payload.IsRecursive;
 
         _context.Subscriptions.Update(existSubscription);
         await _context.SaveChangesAsync();

@@ -12,4 +12,5 @@ public class Payload
     public string ChartColor { get; set; } = string.Empty;
     public Guid? DiscountId { get; set; }
     public DateTime RenewalDate { get; set; }
+    public bool IsRecursive { get; set; }
 }
