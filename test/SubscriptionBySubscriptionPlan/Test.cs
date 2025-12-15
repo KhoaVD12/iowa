@@ -20,7 +20,7 @@ public class Test
                     secretKey: "secretKey"
                 );
         var services = new ServiceCollection();
-        services.AddEndpoints(providerConfig);
+        services.AddProviders(providerConfig);
         Cluster cluster = Cluster.Builder()
                     .AddContactPoint("localhost")
                     .WithPort(9042)
@@ -43,9 +43,8 @@ public class Test
             Price = 9.99m,
             SubscriptionPlan = "Basic",
             RenewalDate = DateTime.UtcNow.AddMonths(1),
-            Company = "Test Company",
-            IsRecusive = true,
-            CompanyId = Guid.NewGuid()
+            CompanyName = "Test Company",
+            IsRecusive = true
         };
         await tempContext.SubscriptionBySubscriptionPlans.Insert(subscriptionBySubscriptionPlan).ExecuteAsync();
         var endpoint = serviceProvider.GetRequiredService<Provider.SubscriptionBySubcriptionPlan.IRefitInterface>();

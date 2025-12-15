@@ -19,15 +19,6 @@ public class Handler
             await _context.Packages.Where(x => x.ProviderId == message.Id).ExecuteDeleteAsync();
         }
         await _context.SaveChangesAsync();
-
-
-        var existSubcriptions = _context.Subscriptions.Where(x => x.ProviderId == message.Id);
-        if (existSubcriptions.Any())
-        {
-            await _context.Subscriptions.Where(x => x.ProviderId == message.Id).ExecuteDeleteAsync();
-        }
-        await _context.SaveChangesAsync();
-
     }
 
 }
