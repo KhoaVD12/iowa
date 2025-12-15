@@ -183,19 +183,11 @@ public class Controller : ControllerBase
                                        [FromBody] JsonPatchDocument<Table> patchDoc,
                                        CancellationToken cancellationToken = default!)
     {
-        //if (User.Identity is null)
-        //    return Unauthorized();
-
-        //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //if (userId is null)
-        //    return Unauthorized("User Id not found");
-        var changes = new List<(string Path, object? Value)>();
-
         foreach (var op in patchDoc.Operations)
         {
             if (op.OperationType != OperationType.Replace && op.OperationType != OperationType.Test)
                 return BadRequest("Only Replace and Test operations are allowed in this patch request.");
-            changes.Add((op.path, op.value));
+            //changes.Add((op.path, op.value));
         }
 
         if (patchDoc is null)

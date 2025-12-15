@@ -18,7 +18,7 @@ public class Test
                     secretKey: "secretKey"
                 );
         var services = new ServiceCollection();
-        services.AddEndpoints(providerConfig);
+        services.AddProviders(providerConfig);
         services.AddDbContext<IowaContext>(options =>
                 options.UseSqlServer("Server=localhost;Database=Iowa;Trusted_Connection=True;TrustServerCertificate=True"));
         this.serviceProvider = services.BuildServiceProvider();
@@ -49,7 +49,7 @@ public class Test
         {
             Id = provider.Id
         };
-        var result = await providerEndpoint.Get(new()
+        var result = await providerEndpoint.GetAsync(new()
         {
         });
         var items = result?.Content?.Items;
@@ -80,7 +80,7 @@ public class Test
             WebsiteUrl = "https://example.com"
         };
 
-        await endpoint.Post(payload);
+        await endpoint.PostAsync(payload);
 
         var expected = await dbContext.Providers.FirstOrDefaultAsync(p => p.Name == name);
 
@@ -122,7 +122,7 @@ public class Test
             WebsiteUrl = "https://updated.com"
         };
 
-        await endpoint.Put(payload);
+        await endpoint.PutAsync(payload);
 
         await dbContext.Entry(provider).ReloadAsync();
 
@@ -154,7 +154,7 @@ public class Test
         await dbContext.SaveChangesAsync();
 
         var providerEndpoint = serviceProvider!.GetRequiredService<Provider.Providers.IRefitInterface>();
-        await providerEndpoint.Delete(new Provider.Providers.Delete.Parameters { Id = id });
+        await providerEndpoint.DeleteAsync(new Provider.Providers.Delete.Parameters { Id = id });
 
         await dbContext.Entry(provider).ReloadAsync();
 
@@ -191,7 +191,7 @@ public class Test
             new Operation { op = "replace", path = "/WebsiteUrl", value = "https://patched.com" }
         };
 
-        await endpoint.Patch(
+        await endpoint.PatchAsync(
             new Provider.Providers.Patch.Parameters { Id = provider.Id },
             operations
         );

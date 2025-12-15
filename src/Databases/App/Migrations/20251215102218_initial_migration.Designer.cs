@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Iowa.Databases.App.Migrations
 {
     [DbContext(typeof(IowaContext))]
-    [Migration("20251208154946_IowaReMigration")]
-    partial class IowaReMigration
+    [Migration("20251215102218_initial_migration")]
+    partial class initial_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -108,9 +108,6 @@ namespace Iowa.Databases.App.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("ProviderId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid?>("UpdateById")
                         .HasColumnType("uniqueidentifier");
 
@@ -187,6 +184,9 @@ namespace Iowa.Databases.App.Migrations
                     b.Property<decimal?>("DiscountedPrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("IsRecursive")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("LastUpdated")
                         .HasColumnType("datetime2");
 
@@ -202,8 +202,8 @@ namespace Iowa.Databases.App.Migrations
                     b.Property<DateTime>("RenewalDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");

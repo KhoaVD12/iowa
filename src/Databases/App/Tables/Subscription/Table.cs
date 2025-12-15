@@ -15,7 +15,8 @@ public class Table
     public string ChartColor { get; set; } = string.Empty;
     public Guid? DiscountId { get; set; }
     public DateTime RenewalDate { get; set; }
-    public string? Status { get; set; }
+    public bool Status { get; set; }
+    public bool IsRecursive { get; set; }
     public DateTime CreatedDate { get; set; }
     public Guid CreatedById { get; set; }
     public DateTime? LastUpdated { get; set; }

@@ -8,7 +8,8 @@ public class Parameters
     public Guid? PackageId { get; set; }
     public string? Currency { get; set; }
     public string ChartColor { get; set; } = string.Empty;
-    public string? Status { get; set; }
+    public bool? Status { get; set; }
     public int? PageIndex { get; set; }
     public int? PageSize { get; set; }
+    public bool? IsRecursive { get; set; }
 }

@@ -1,10 +1,13 @@
 ﻿using Iowa.Databases.App;
 using Iowa.Models.PaginationResults;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
+using System.Security.Claims;
 using Wolverine;
 
 namespace Iowa.PaymentHistories;
@@ -24,11 +27,13 @@ public class Controller : ControllerBase
         _context = context;
         _hubContext = hubContext;
     }
+
     [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> Get([FromQuery] Get.Parameters parameters)
     {
         var query = _context.PaymentHistories.AsQueryable();
+
         if (parameters.Id.HasValue) 
         { 
             query = query.Where(x => x.Id == parameters.Id.Value);
@@ -64,7 +69,7 @@ public class Controller : ControllerBase
             .WithTotal(paymentHistories.Count())
             .WithItems(paymentHistories)
             .Build();
-        return Ok(paymentHistories);
+        return Ok(paginationResults);
     }
 
     [HttpPost]
@@ -74,7 +79,6 @@ public class Controller : ControllerBase
 
         table.Id = Guid.NewGuid();
         table.UserId = payload.UserId;
-        table.ProviderId = payload.ProviderId;
         table.PackageId = payload.PackageId;
         table.DiscountId = payload.DiscountId;
         table.ChartColor = payload.ChartColor;
@@ -122,7 +126,6 @@ public class Controller : ControllerBase
         }
 
         existPaymentHistory.UserId = payload.UserId;
-        existPaymentHistory.ProviderId = payload.ProviderId;
         existPaymentHistory.PackageId = payload.PackageId;
         existPaymentHistory.DiscountId = payload.DiscountId;
         existPaymentHistory.ChartColor = payload.ChartColor;
@@ -149,6 +152,49 @@ public class Controller : ControllerBase
         await _context.SaveChangesAsync();
         await _messageBus.PublishAsync(new Put.Messager.Message(payload.Id));
         await _hubContext.Clients.All.SendAsync("PaymentHistory-Updated", payload.Id);
+        return NoContent();
+    }
+
+    [HttpPatch]
+    public async Task<IActionResult> Patch([FromQuery] Guid id, [FromBody] JsonPatchDocument<Databases.App.Tables.PaymentHistory.Table> patchDoc,
+                                   CancellationToken cancellationToken = default!)
+    {
+        //if (User.Identity is null)
+        //    return Unauthorized();
+
+        //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //if (userId is null)
+        //    return Unauthorized("User Id not found");
+
+        var changes = new List<(string Path, object? Value)>();
+        foreach (var op in patchDoc.Operations)
+        {
+            if (op.OperationType != OperationType.Replace && op.OperationType != OperationType.Test)
+                return BadRequest("Only Replace and Test operations are allowed in this patch request.");
+            changes.Add((op.path, op.value));
+        }
+
+        if (patchDoc is null)
+            return BadRequest("Patch document cannot be null.");
+
+        var entity = await _context.PaymentHistories.FindAsync(id, cancellationToken);
+        if (entity == null)
+            return NotFound(new ProblemDetails
+            {
+                Title = "PaymentHistory not found",
+                Detail = $"PaymentHistory with ID {id} does not exist.",
+                Status = StatusCodes.Status404NotFound,
+                Instance = HttpContext.Request.Path
+            });
+
+        patchDoc.ApplyTo(entity);
+
+        entity.LastUpdated = DateTime.UtcNow;
+
+        _context.PaymentHistories.Update(entity);
+        await _context.SaveChangesAsync(cancellationToken);
+
+
         return NoContent();
     }
 

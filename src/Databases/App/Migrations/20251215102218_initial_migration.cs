@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Iowa.Databases.App.Migrations
 {
     /// <inheritdoc />
-    public partial class IowaReMigration : Migration
+    public partial class initial_migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,7 +38,6 @@ namespace Iowa.Databases.App.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProviderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PackageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DiscountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ChartColor = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -89,7 +88,8 @@ namespace Iowa.Databases.App.Migrations
                     ChartColor = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DiscountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     RenewalDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    IsRecursive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
