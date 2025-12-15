@@ -18,7 +18,7 @@ public class Test
                     secretKey: "secretKey"
                 );
         var services = new ServiceCollection();
-        services.AddEndpoints(providerConfig);
+        services.AddProviders(providerConfig);
         services.AddDbContext<IowaContext>(options =>
                 options.UseSqlServer("Server=localhost;Database=Iowa;Trusted_Connection=True;TrustServerCertificate=True"));
         this.serviceProvider = services.BuildServiceProvider();
@@ -28,7 +28,7 @@ public class Test
     #region [ Endpoints ]
 
     [Fact]
-    public async Task GET_DataExist()
+    public async Task GET_Provider()
     {
         var dbContext = serviceProvider!.GetRequiredService<IowaContext>();
         var provider = new Iowa.Databases.App.Tables.Provider.Table
@@ -39,17 +39,21 @@ public class Test
             IconUrl = "https://example.com/provider.png",
             WebsiteUrl = "https://example.com",
             CreatedDate = DateTime.UtcNow,
-            LastUpdated = DateTime.UtcNow
+            LastUpdated = DateTime.UtcNow,
+            CreatedById = Guid.NewGuid()
         };
         dbContext.Providers.Add(provider);
         await dbContext.SaveChangesAsync();
-        var exercisesEndpoint = serviceProvider!.GetRequiredService<Provider.Providers.IRefitInterface>();
-        var result = await exercisesEndpoint.Get(new()
+        var providerEndpoint = serviceProvider!.GetRequiredService<Provider.Providers.IRefitInterface>();
+        var getParameters = new Provider.Providers.Get.Parameters
+        {
+            Id = provider.Id
+        };
+        var result = await providerEndpoint.GetAsync(new()
         {
         });
         var items = result?.Content?.Items;
 
-        Assert.NotNull(result);
         Assert.NotNull(result);
         Assert.NotNull(result.Content);
         Assert.True(items.Count > 0, "Expected at least one exercise in result.");
@@ -59,7 +63,7 @@ public class Test
     }
 
     [Fact]
-    public async Task POST_Package()
+    public async Task POST_Provider()
     {
         var dbContext = serviceProvider!.GetRequiredService<IowaContext>();
 
@@ -76,7 +80,7 @@ public class Test
             WebsiteUrl = "https://example.com"
         };
 
-        await endpoint.Post(payload);
+        await endpoint.PostAsync(payload);
 
         var expected = await dbContext.Providers.FirstOrDefaultAsync(p => p.Name == name);
 
@@ -118,7 +122,7 @@ public class Test
             WebsiteUrl = "https://updated.com"
         };
 
-        await endpoint.Put(payload);
+        await endpoint.PutAsync(payload);
 
         await dbContext.Entry(provider).ReloadAsync();
 
@@ -134,27 +138,28 @@ public class Test
     public async Task DELETE_Provider()
     {
         var dbContext = serviceProvider!.GetRequiredService<IowaContext>();
-
+        var id = Guid.NewGuid();
         var provider = new Iowa.Databases.App.Tables.Provider.Table
         {
-            Id = Guid.NewGuid(),
+            Id = id,
             Name = "DELETE TEST PROVIDER",
             Description = "For DELETE test",
             IconUrl = "https://example.com/test.png",
             WebsiteUrl = "https://example.com",
             CreatedDate = DateTime.UtcNow,
-            LastUpdated = DateTime.UtcNow
+            LastUpdated = DateTime.UtcNow,
         };
 
         dbContext.Providers.Add(provider);
         await dbContext.SaveChangesAsync();
 
-        var endpoint = serviceProvider!.GetRequiredService<Provider.Providers.IRefitInterface>();
+        var providerEndpoint = serviceProvider!.GetRequiredService<Provider.Providers.IRefitInterface>();
+        await providerEndpoint.DeleteAsync(new Provider.Providers.Delete.Parameters { Id = id });
 
-        await endpoint.Delete(new Provider.Providers.Delete.Parameters { Id = provider.Id });
+        await dbContext.Entry(provider).ReloadAsync();
 
-        var deleted = await dbContext.Providers.FindAsync(provider.Id);
-        Assert.Null(deleted);
+        var deletedProvider = await dbContext.Providers.FindAsync(id);
+        Assert.Null(deletedProvider);
     }
 
 
@@ -186,7 +191,7 @@ public class Test
             new Operation { op = "replace", path = "/WebsiteUrl", value = "https://patched.com" }
         };
 
-        await endpoint.Patch(
+        await endpoint.PatchAsync(
             new Provider.Providers.Patch.Parameters { Id = provider.Id },
             operations
         );
@@ -197,6 +202,7 @@ public class Test
         Assert.Equal("Patched description", provider.Description);
         Assert.Equal("https://patched.com", provider.WebsiteUrl);
 
+        //Clean up
         dbContext.Providers.Remove(provider);
         await dbContext.SaveChangesAsync();
     }

@@ -19,6 +19,11 @@
 		<PackageReference Include="WolverineFx.EntityFrameworkCore" Version="5.4.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+		<PackageReference Include="CassandraCSharpDriver" Version="3.22.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Databases\App\Migrations\" />
 	</ItemGroup>
 
 </Project>
