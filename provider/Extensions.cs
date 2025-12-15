@@ -8,7 +8,7 @@ namespace Provider;
 
 public static class Extensions
 {
-    public static IServiceCollection AddEndpoints(this IServiceCollection services, Config config)
+    public static IServiceCollection AddProviders(this IServiceCollection services, Config config)
     {
         services.AddSingleton(config);
         services.AddTransient<MachineToken.Service>();

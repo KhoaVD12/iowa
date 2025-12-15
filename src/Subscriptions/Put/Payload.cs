@@ -12,6 +12,7 @@ public class Payload
     public decimal DiscountedPrice { get; set; }
     public string Currency { get; set; } = string.Empty;
     public string ChartColor { get; set; } = string.Empty;
+    public bool Status { get; set; }
     public Guid DiscountId { get; set; }
     public DateTime RenewalDate { get; set; }
 }

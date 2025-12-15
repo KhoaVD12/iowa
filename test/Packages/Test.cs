@@ -19,7 +19,7 @@ public class Test
                     secretKey: "secretKey"
                 );
         var services = new ServiceCollection();
-        services.AddEndpoints(providerConfig);
+        services.AddProviders(providerConfig);
         services.AddDbContext<IowaContext>(options =>
                 options.UseSqlServer("Server=localhost;Database=Iowa;Trusted_Connection=True;TrustServerCertificate=True"));
         this.serviceProvider = services.BuildServiceProvider();
@@ -47,7 +47,7 @@ public class Test
         dbContext.Packages.Add(package);
         await dbContext.SaveChangesAsync();
         var exercisesEndpoint = serviceProvider!.GetRequiredService<Provider.Packages.IRefitInterface>();
-        var result = await exercisesEndpoint.Get(new()
+        var result = await exercisesEndpoint.GetAsync(new()
         {
         });
         var items = result?.Content?.Items;
@@ -96,7 +96,7 @@ public class Test
             Currency = "USD"
         };
 
-        await packagesEndpoint.Post(payload);
+        await packagesEndpoint.PostAsync(payload);
 
         var expected = await dbContext.Packages.FirstOrDefaultAsync(p => p.Name == name);
         Assert.NotNull(expected);
@@ -158,7 +158,7 @@ public class Test
             Currency = "USD"
         };
 
-        await packagesEndpoint.Put(payload);
+        await packagesEndpoint.PutAsync(payload);
 
         await dbContext.Entry(existingPackage).ReloadAsync();
         var updatedPackage = existingPackage;
@@ -211,7 +211,7 @@ public class Test
         await dbContext.SaveChangesAsync();
 
         var packagesEndpoint = serviceProvider!.GetRequiredService<Provider.Packages.IRefitInterface>();
-        await packagesEndpoint.Delete(new Provider.Packages.Delete.Parameters { Id = id });
+        await packagesEndpoint.DeleteAsync(new Provider.Packages.Delete.Parameters { Id = id });
 
         await dbContext.Entry(existingPackage).ReloadAsync();
 
@@ -267,7 +267,7 @@ public class Test
         new Operation { op = "replace", path = "/Price", value = 49.99m }
     };
 
-        await packagesEndpoint.Patch(new Provider.Packages.Patch.Parameters { Id = id }, operations);
+        await packagesEndpoint.PatchAsync(new Provider.Packages.Patch.Parameters { Id = id }, operations);
 
         await dbContext.Entry(existingPackage).ReloadAsync();
         var patchedPackage = existingPackage;

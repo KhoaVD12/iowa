@@ -51,7 +51,7 @@ public class Controller : ControllerBase
         {
             query = query.Where(x => x.Currency == parameters.Currency);
         }
-        if (!string.IsNullOrEmpty(parameters.Status))
+        if (parameters.Status.HasValue)
         {
             query = query.Where(x => x.Status == parameters.Status);
         }
@@ -102,7 +102,7 @@ public class Controller : ControllerBase
         table.ChartColor = payload.ChartColor;
         table.DiscountId = payload.DiscountId;
         table.RenewalDate = payload.RenewalDate;
-        table.Status = "active";
+        table.Status = payload.Status;
         table.CreatedDate = DateTime.UtcNow;
         table.CreatedById = payload.UserId;
 
@@ -150,6 +150,7 @@ public class Controller : ControllerBase
         existSubscription.RenewalDate = payload.RenewalDate;
         existSubscription.LastUpdated = DateTime.UtcNow;
         existSubscription.UpdatedById = payload.UserId;
+        existSubscription.Status = payload.Status;
 
         _context.Subscriptions.Update(existSubscription);
         await _context.SaveChangesAsync();
