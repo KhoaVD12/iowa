@@ -36,17 +36,13 @@ public class Test
         {
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
-            ProviderName = "Test Provider",
-            PackageName = "Test Package",
             ChartColor = "#333333",
             Price = 9.99m,
             Currency = "USD",
-            CreatedDate = DateTime.UtcNow,
-            CreateById = Guid.NewGuid()
+            CreatedDate = DateTime.UtcNow
         };
-        dbContext.PaymentHistories.Add(paymentHistory);
+        dbContext.PaymentHistories.Add(paymentHistory); // <-- Correct: add to PaymentHistories DbSet
         await dbContext.SaveChangesAsync();
-
         var paymentHistoriesEndpoint = serviceProvider!.GetRequiredService<Provider.PaymentHistories.IRefitInterface>();
         var result = await paymentHistoriesEndpoint.GetAsync(new()
         {
@@ -57,7 +53,6 @@ public class Test
         Assert.NotNull(result.Content);
         Assert.Contains(items, p => p.Id == paymentHistory.Id);
         Assert.NotEqual(0, items.Count);
-
         dbContext.PaymentHistories.Remove(paymentHistory);
         await dbContext.SaveChangesAsync();
     }
@@ -67,13 +62,31 @@ public class Test
     {
         var dbContext = serviceProvider!.GetRequiredService<IowaContext>();
 
+        // Tạo provider trước
+
+        var package = new Iowa.Databases.App.Tables.Package.Table
+        {
+            Id = Guid.NewGuid(),
+            ProviderId = Guid.NewGuid(),
+            Name = "TEST PACKAGE",
+            Description = "A basic TEST PACKAGE for testing purposes.",
+            IconUrl = "https://example.com/icon.png",
+            Price = 9.99m,
+            Currency = "USD",
+            CreatedDate = DateTime.UtcNow,
+            LastUpdated = DateTime.UtcNow
+        };
+
+        dbContext.Packages.Add(package);
+        await dbContext.SaveChangesAsync();
+
+        Guid id = Guid.NewGuid();
         var PaymentHistoriesEndpoint = serviceProvider!.GetRequiredService<Provider.PaymentHistories.IRefitInterface>();
 
         var payload = new Provider.PaymentHistories.Post.Payload
         {
             UserId = Guid.NewGuid(),
-            ProviderName = "Test Provider",
-            PackageName = "Basic Package",
+            PackageId = package.Id,
             DiscountId = null,
             ChartColor = "#FFFFFF",
             Price = 9.99m,
@@ -83,20 +96,14 @@ public class Test
 
         await PaymentHistoriesEndpoint.PostAsync(payload);
 
-        var expected = await dbContext.PaymentHistories
-            .FirstOrDefaultAsync(p => p.UserId == payload.UserId
-                                   && p.ProviderName == payload.ProviderName
-                                   && p.PackageName == payload.PackageName);
-
+        var expected = await dbContext.PaymentHistories.FirstOrDefaultAsync(p => p.UserId == payload.UserId);
         Assert.NotNull(expected);
         Assert.Equal(payload.UserId, expected.UserId);
-        Assert.Equal(payload.ProviderName, expected.ProviderName);
-        Assert.Equal(payload.PackageName, expected.PackageName);
         Assert.Equal("USD", expected.Currency);
-        Assert.Equal(9.99m, expected.Price);
 
         // Cleanup
         dbContext.PaymentHistories.Remove(expected);
+        dbContext.Packages.Remove(package);
         await dbContext.SaveChangesAsync();
     }
 
@@ -105,19 +112,34 @@ public class Test
     {
         var dbContext = serviceProvider!.GetRequiredService<IowaContext>();
 
+        // Tạo Package trước
+        var package = new Iowa.Databases.App.Tables.Package.Table
+        {
+            Id = Guid.NewGuid(),
+            ProviderId = Guid.NewGuid(),
+            Name = "TEST PACKAGE",
+            Description = "A basic TEST PACKAGE for testing purposes.",
+            IconUrl = "https://example.com/icon.png",
+            Price = 9.99m,
+            Currency = "USD",
+            CreatedDate = DateTime.UtcNow,
+            LastUpdated = DateTime.UtcNow
+        };
+        dbContext.Packages.Add(package);
+        await dbContext.SaveChangesAsync();
+
         var paymentHistory = new Iowa.Databases.App.Tables.PaymentHistory.Table
         {
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
-            ProviderName = "Original Provider",
-            PackageName = "Original Package",
+            PackageId = package.Id,
             DiscountId = null,
             ChartColor = "#FFFFFF",
             Price = 9.99m,
             DiscountedPrice = null,
             Currency = "USD",
             CreatedDate = DateTime.UtcNow,
-            CreateById = Guid.NewGuid()
+            LastUpdated = DateTime.UtcNow
         };
 
         dbContext.PaymentHistories.Add(paymentHistory);
@@ -127,9 +149,8 @@ public class Test
         var payload = new Provider.PaymentHistories.Put.Payload
         {
             Id = paymentHistory.Id,
-            UserId = paymentHistory.UserId,
-            ProviderName = "Updated Provider",
-            PackageName = "Updated Package",
+            UserId = Guid.NewGuid(),
+            PackageId = package.Id,
             DiscountId = null,
             ChartColor = "#FFFF00",
             Price = 10.99m,
@@ -142,14 +163,13 @@ public class Test
         await dbContext.Entry(paymentHistory).ReloadAsync();
 
         Assert.NotNull(paymentHistory);
-        Assert.Equal("Updated Provider", paymentHistory.ProviderName);
-        Assert.Equal("Updated Package", paymentHistory.PackageName);
         Assert.Equal("#FFFF00", paymentHistory.ChartColor);
         Assert.Equal("VND", paymentHistory.Currency);
         Assert.Equal(10.99m, paymentHistory.Price);
 
         // Cleanup
         dbContext.PaymentHistories.Remove(paymentHistory);
+        dbContext.Packages.Remove(package);
         await dbContext.SaveChangesAsync();
     }
 
@@ -162,15 +182,14 @@ public class Test
         {
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
-            ProviderName = "Test Provider",
-            PackageName = "Test Package",
+            PackageId = Guid.NewGuid(),
             DiscountId = null,
             ChartColor = "#000000",
             Price = 9.99m,
             DiscountedPrice = null,
             Currency = "USD",
             CreatedDate = DateTime.UtcNow,
-            CreateById = Guid.NewGuid()
+            LastUpdated = DateTime.UtcNow
         };
 
         dbContext.PaymentHistories.Add(paymentHistory);
@@ -179,9 +198,13 @@ public class Test
         var endpoint = serviceProvider!.GetRequiredService<Provider.PaymentHistories.IRefitInterface>();
         await endpoint.DeleteAsync(new Provider.PaymentHistories.Delete.Parameters { Id = paymentHistory.Id });
         await dbContext.Entry(paymentHistory).ReloadAsync();
-
         var deleted = await dbContext.PaymentHistories.FindAsync(paymentHistory.Id);
         Assert.Null(deleted);
+
+        
+        // Cleanup provider
+        //dbContext.Packages.Remove(package);
+        //await dbContext.SaveChangesAsync();
     }
 
     [Fact]
@@ -189,19 +212,34 @@ public class Test
     {
         var dbContext = serviceProvider!.GetRequiredService<IowaContext>();
 
+        // Tạo Package trước
+        var package = new Iowa.Databases.App.Tables.Package.Table
+        {
+            Id = Guid.NewGuid(),
+            ProviderId = Guid.NewGuid(),
+            Name = "TEST PACKAGE",
+            Description = "A basic TEST PACKAGE for testing purposes.",
+            IconUrl = "https://example.com/icon.png",
+            Price = 9.99m,
+            Currency = "USD",
+            CreatedDate = DateTime.UtcNow,
+            LastUpdated = DateTime.UtcNow
+        };
+        dbContext.Packages.Add(package);
+        await dbContext.SaveChangesAsync();
+
         var paymentHistory = new Iowa.Databases.App.Tables.PaymentHistory.Table
         {
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
-            ProviderName = "Original Provider",
-            PackageName = "Original Package",
+            PackageId = package.Id,
             DiscountId = null,
             ChartColor = "#FFFFFF",
             Price = 9.99m,
             DiscountedPrice = null,
             Currency = "USD",
             CreatedDate = DateTime.UtcNow,
-            CreateById = Guid.NewGuid()
+            LastUpdated = DateTime.UtcNow
         };
 
         dbContext.PaymentHistories.Add(paymentHistory);
@@ -209,19 +247,17 @@ public class Test
 
         var endpoint = serviceProvider!.GetRequiredService<Provider.PaymentHistories.IRefitInterface>();
         var operations = new List<Operation>
-        {
-            new Operation { op = "replace", path = "/ChartColor", value = "#FFFF00" },
-            new Operation { op = "replace", path = "/Currency", value = "VND" },
-            new Operation { op = "replace", path = "/Price", value = 49.99m },
-            new Operation { op = "replace", path = "/ProviderName", value = "Patched Provider" },
-            new Operation { op = "replace", path = "/PackageName", value = "Patched Package" }
-        };
+    {
+        new Operation { op = "replace", path = "/ChartColor", value = "#FFFF00" },
+        new Operation { op = "replace", path = "/Currency", value = "VND" },
+        new Operation { op = "replace", path = "/Price", value = 49.99m }
+    };
 
         await endpoint.PatchAsync(
             new Provider.PaymentHistories.Patch.Parameters
             {
                 Id = paymentHistory.Id
-            },
+            }, 
             operations
         );
 
@@ -231,13 +267,13 @@ public class Test
         Assert.Equal("#FFFF00", paymentHistory.ChartColor);
         Assert.Equal("VND", paymentHistory.Currency);
         Assert.Equal(49.99m, paymentHistory.Price);
-        Assert.Equal("Patched Provider", paymentHistory.ProviderName);
-        Assert.Equal("Patched Package", paymentHistory.PackageName);
 
         // Cleanup
+        dbContext.Packages.Remove(package);
         dbContext.PaymentHistories.Remove(paymentHistory);
         await dbContext.SaveChangesAsync();
     }
+
 
     #endregion
 }

@@ -3,8 +3,7 @@
 public class Payload
 {
     public Guid UserId { get; set; }
-    public string ProviderName { get; set; } = string.Empty;
-    public string PackageName { get; set; } = string.Empty;
+    public Guid PackageId { get; set; }
     public Guid? DiscountId { get; set; }
     public string ChartColor { get; set; } = string.Empty;
     public decimal Price { get; set; }

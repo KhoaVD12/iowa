@@ -34,70 +34,28 @@ public class Controller : ControllerBase
     {
         var query = _context.PaymentHistories.AsQueryable();
 
-        if (parameters.Id.HasValue)
-        {
+        if (parameters.Id.HasValue) 
+        { 
             query = query.Where(x => x.Id == parameters.Id.Value);
         }
-
-        if (parameters.UserId.HasValue)
-        {
+        if (parameters.UserId.HasValue) 
+        { 
             query = query.Where(x => x.UserId == parameters.UserId.Value);
         }
-
-        if (!string.IsNullOrEmpty(parameters.ProviderName))
-        {
-            query = query.Where(x => x.ProviderName == parameters.ProviderName);
-        }
-
-        if (!string.IsNullOrEmpty(parameters.PackageName))
-        {
-            query = query.Where(x => x.PackageName == parameters.PackageName);
-        }
-
-        if (parameters.DiscountId.HasValue)
-        {
-            query = query.Where(x => x.DiscountId == parameters.DiscountId.Value);
-        }
-
-        if (!string.IsNullOrEmpty(parameters.ChartColor))
-        {
+        if (!string.IsNullOrEmpty(parameters.ChartColor)) 
+        { 
             query = query.Where(x => x.ChartColor == parameters.ChartColor);
         }
-
-        if (parameters.Price.HasValue)
-        {
+        if (parameters.Price.HasValue) 
+        { 
             query = query.Where(x => x.Price == parameters.Price.Value);
         }
-
-        if (parameters.DiscountedPrice.HasValue)
-        {
-            query = query.Where(x => x.DiscountedPrice == parameters.DiscountedPrice.Value);
-        }
-
-        if (!string.IsNullOrEmpty(parameters.Currency))
-        {
+        if (!string.IsNullOrEmpty(parameters.Currency)) 
+        { 
             query = query.Where(x => x.Currency == parameters.Currency);
         }
 
-        if (parameters.CreatedDate.HasValue)
-        {
-            query = query.Where(x => x.CreatedDate == parameters.CreatedDate.Value);
-        }
-
-        if (parameters.LastUpdated.HasValue)
-        {
-            query = query.Where(x => x.LastUpdated == parameters.LastUpdated.Value);
-        }
-
-        if (parameters.CreateById.HasValue)
-        {
-            query = query.Where(x => x.CreateById == parameters.CreateById.Value);
-        }
-
-        if (parameters.UpdateById.HasValue)
-        {
-            query = query.Where(x => x.UpdateById == parameters.UpdateById.Value);
-        }
+        query = query.OrderByDescending(x => x.CreatedDate);
         if (parameters.PageIndex.HasValue && parameters.PageSize.HasValue) 
         { 
             var skip = parameters.PageIndex.Value * parameters.PageSize.Value;
@@ -121,13 +79,13 @@ public class Controller : ControllerBase
 
         table.Id = Guid.NewGuid();
         table.UserId = payload.UserId;
-        table.ProviderName = payload.ProviderName;
-        table.PackageName = payload.PackageName;
+        table.PackageId = payload.PackageId;
         table.DiscountId = payload.DiscountId;
         table.ChartColor = payload.ChartColor;
         table.Price = payload.Price;
         table.DiscountedPrice = payload.DiscountedPrice;
         table.Currency = payload.Currency;
+        //table.PaymentDate = DateTime.UtcNow;
         table.CreatedDate = DateTime.UtcNow;
         table.CreateById = payload.UserId; // Replace with actual user ID
 
@@ -168,15 +126,13 @@ public class Controller : ControllerBase
         }
 
         existPaymentHistory.UserId = payload.UserId;
-        existPaymentHistory.ProviderName = payload.ProviderName;
-        existPaymentHistory.PackageName = payload.PackageName;
+        existPaymentHistory.PackageId = payload.PackageId;
         existPaymentHistory.DiscountId = payload.DiscountId;
         existPaymentHistory.ChartColor = payload.ChartColor;
         existPaymentHistory.Price = payload.Price;
         existPaymentHistory.DiscountedPrice = payload.DiscountedPrice;
         existPaymentHistory.Currency = payload.Currency;
         existPaymentHistory.LastUpdated =  DateTime.UtcNow;
-        existPaymentHistory.UpdateById = payload.UserId;
 
         //var existingPackage = await _context.Packages.FindAsync(payload.PackageId);
 

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Iowa.Databases.App.Migrations
 {
     [DbContext(typeof(IowaContext))]
-    [Migration("20251215072711_initial_migration")]
+    [Migration("20251215102218_initial_migration")]
     partial class initial_migration
     {
         /// <inheritdoc />
@@ -99,16 +99,14 @@ namespace Iowa.Databases.App.Migrations
                     b.Property<DateTime?>("LastUpdated")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PackageName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("PackageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ProviderName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("UpdateById")
                         .HasColumnType("uniqueidentifier");
