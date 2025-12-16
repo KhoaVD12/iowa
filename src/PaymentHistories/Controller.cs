@@ -12,6 +12,7 @@ using Wolverine;
 
 namespace Iowa.PaymentHistories;
 
+[Authorize]
 [Route("api/payment-histories")]
 [ApiController]
 public class Controller : ControllerBase
