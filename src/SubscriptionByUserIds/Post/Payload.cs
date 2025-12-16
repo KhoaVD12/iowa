@@ -1,11 +1,7 @@
-﻿using Cassandra.Mapping.Attributes;
+﻿namespace Iowa.SubscriptionByUserIds.Post;
 
-namespace Iowa.Databases.TempDb.Tables.SubscriptionBySubscriptionPlan;
-
-[Table("subscription_by_subscriptionplan")]
-public class Table
+public class Payload
 {
-    public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public string SubscriptionPlan { get; set; } = string.Empty;
     public string CompanyName { get; set; } = string.Empty;

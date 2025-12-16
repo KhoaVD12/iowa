@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Provider.SubscriptionBySubcriptionPlan;
+namespace Provider.UserIdBySubscriptionPlans;
 
 public static class Extensions
 {
-    public static void RegisterSubscriptionBySubscriptionPlan(this IServiceCollection services, Config config)
+    public static void RegisterUserIdBySubscriptionPlans(this IServiceCollection services, Config config)
     {
         services.AddTransient<RefitHttpClientHandler>();
 

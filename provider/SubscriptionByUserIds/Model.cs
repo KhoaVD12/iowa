@@ -1,7 +1,12 @@
-﻿namespace Iowa.SubscriptionBySubscriptionPlan.Post;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-public class Payload
+namespace Provider.SubscriptionByUserIds;
+
+public class Model
 {
+    public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public string SubscriptionPlan { get; set; } = string.Empty;
     public string CompanyName { get; set; } = string.Empty;

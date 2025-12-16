@@ -2,8 +2,9 @@
 using Provider.Packages;
 using Provider.PaymentHistories;
 using Provider.Providers;
-using Provider.SubscriptionBySubcriptionPlan;
+using Provider.SubscriptionByUserIds;
 using Provider.Subscriptions;
+using Provider.UserIdBySubscriptionPlans;
 
 namespace Provider;
 
@@ -17,7 +18,8 @@ public static class Extensions
         services.RegisterSubscriptions(config);
         services.RegisterProviders(config);
         services.RegisterPaymentHistories(config);
-        services.RegisterSubscriptionBySubscriptionPlan(config);
+        services.RegisterSubscriptionByUserIds(config);
+        services.RegisterUserIdBySubscriptionPlans(config);
         return services;
     }
 }
