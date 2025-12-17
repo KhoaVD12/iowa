@@ -1,5 +1,6 @@
 ﻿using Cassandra.Data.Linq;
 using Iowa.Models.PaginationResults;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using Wolverine;
 namespace Iowa.SubscriptionByUserIds;
 
 [Route("api/subscription-by-user-ids")]
+[Authorize]
 [ApiController]
 public class Controller : ControllerBase
 {

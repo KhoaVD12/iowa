@@ -11,5 +11,5 @@ public interface IRefitInterface
     Task<ApiResponse<ICollection<Model>>> GetAsync([Query] Get.Parameters parameters);
 
     [Post("/api/subscription-by-user-ids")]
-    Task<ApiResponse<object>> Post([Body] Post.Payload payload);
+    Task<ApiResponse<object>> PostAsync([Body] Post.Payload payload);
 }

@@ -8,5 +8,5 @@ namespace Provider.UserIdBySubscriptionPlans;
 public interface IRefitInterface
 {
     [Get("/api/user-id-by-subscription-plans")]
-    Task<ApiResponse<ICollection<Model>>> Get([Query] Get.Parameters parameters);
+    Task<ApiResponse<ICollection<Model>>> GetAsync([Query] Get.Parameters parameters);
 }
