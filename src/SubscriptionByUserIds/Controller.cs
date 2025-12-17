@@ -56,11 +56,13 @@ public class Controller : ControllerBase
             ChartColor = payload.ChartColor,
             PurchasedDate = payload.PurchasedDate,
             RenewalDate = payload.RenewalDate,
-            IsRecusive = payload.IsRecusive
+            IsRecursive = payload.IsRecusive
         };
 
         await _tempContext.SubscriptionByUserIds.Insert(newRecord).ExecuteAsync();
         await _messageBus.PublishAsync(new Post.Messager.Message(newRecord.UserId, newRecord.SubscriptionPlan, newRecord.CompanyName));
         return CreatedAtAction(nameof(Get), new { id = newRecord.Id });
     }
+
+    
 }

@@ -128,10 +128,13 @@ public class Controller : ControllerBase
             CreatedDate = DateTime.UtcNow,
             LastUpdated = DateTime.UtcNow
         };
+        var provider = await _context.Providers.FirstOrDefaultAsync(p => p.Id == payload.ProviderId);
+        var providerName = provider.Name;
+
 
         _context.Packages.Add(package);
         await _context.SaveChangesAsync();
-        await _messageBus.PublishAsync(new Post.Messager.Message(package.Id));
+        await _messageBus.PublishAsync(new Post.Messager.Message(package.Id, package.Name, providerName));
         await _hubContext.Clients.All.SendAsync("package-created", package.Id);
         return CreatedAtAction(nameof(Get), package.Id);
     }

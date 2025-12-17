@@ -14,5 +14,5 @@ public class Table
     public string ChartColor { get; set; } = string.Empty;
     public DateTime PurchasedDate { get; set; }
     public DateTime RenewalDate { get; set; }
-    public bool IsRecusive { get; set; }
+    public bool IsRecursive { get; set; }
 }
