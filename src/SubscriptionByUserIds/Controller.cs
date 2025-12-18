@@ -64,5 +64,18 @@ public class Controller : ControllerBase
         return CreatedAtAction(nameof(Get), new { id = newRecord.Id });
     }
 
-    
+    public async Task<IActionResult> Delete([FromQuery] Delete.Parameters parameters)
+    {
+        Databases.TempDb.Tables.SubscriptionByUserId.Table? existingRecord = await _tempContext.SubscriptionByUserIds.FirstOrDefault(x => x.UserId == parameters.UserId &&
+                                                                                               x.SubscriptionPlan == parameters.SubscriptionPlan &&
+                                                                                               x.CompanyName == parameters.CompanyName).ExecuteAsync();
+        if(existingRecord == null)
+        {
+            return NotFound();
+        }
+        await _tempContext.SubscriptionByUserIds.Where(x => x.UserId == parameters.UserId &&
+                                                            x.SubscriptionPlan == parameters.SubscriptionPlan &&
+                                                            x.CompanyName == parameters.CompanyName).Delete().ExecuteAsync();
+        return NoContent();
+    }
 }
