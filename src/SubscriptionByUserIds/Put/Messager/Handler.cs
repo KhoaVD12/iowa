@@ -1,6 +1,6 @@
 ﻿using Iowa.Databases.TempDb;
 
-namespace Iowa.SubscriptionByUserIds.Post.Messager;
+namespace Iowa.SubscriptionByUserIds.Put.Messager;
 
 public class Handler(TempContext context)
 {

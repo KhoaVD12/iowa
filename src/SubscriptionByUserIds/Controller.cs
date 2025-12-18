@@ -60,7 +60,36 @@ public class Controller : ControllerBase
         };
 
         await _tempContext.SubscriptionByUserIds.Insert(newRecord).ExecuteAsync();
-        await _messageBus.PublishAsync(new Post.Messager.Message(newRecord.UserId, newRecord.SubscriptionPlan, newRecord.CompanyName));
+        await _messageBus.PublishAsync(new Post.Messager.Message(newRecord.Id, newRecord.UserId, newRecord.SubscriptionPlan, newRecord.CompanyName));
+        return CreatedAtAction(nameof(Get), new { id = newRecord.Id });
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> Put([FromBody] Put.Payload payload)
+    {
+        Databases.TempDb.Tables.SubscriptionByUserId.Table? existingRecord = await _tempContext.SubscriptionByUserIds.FirstOrDefault(x => x.UserId == payload.UserId &&
+                                                                                               x.SubscriptionPlan == payload.SubscriptionPlan &&
+                                                                                               x.CompanyName == payload.CompanyName).ExecuteAsync();
+        if (existingRecord == null)
+        {
+            return NotFound();
+        }
+        var newRecord = new Databases.TempDb.Tables.SubscriptionByUserId.Table
+        {
+            Id = payload.Id,
+            UserId = payload.UserId,
+            SubscriptionPlan = payload.SubscriptionPlan,
+            CompanyName = payload.CompanyName,
+            Price = payload.Price,
+            Currency = payload.Currency,
+            ChartColor = payload.ChartColor,
+            PurchasedDate = payload.PurchasedDate,
+            RenewalDate = payload.RenewalDate,
+            IsRecursive = payload.IsRecusive
+        };
+
+        await _tempContext.SubscriptionByUserIds.Insert(newRecord).ExecuteAsync();
+        await _messageBus.PublishAsync(new Put.Messager.Message(newRecord.Id, newRecord.UserId, newRecord.SubscriptionPlan, newRecord.CompanyName));
         return CreatedAtAction(nameof(Get), new { id = newRecord.Id });
     }
 
