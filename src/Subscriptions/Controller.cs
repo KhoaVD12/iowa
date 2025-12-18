@@ -26,7 +26,6 @@ public class Controller : ControllerBase
         _hubContext = hubContext;
     }
     [HttpGet]
-    [AllowAnonymous]
     public async Task<IActionResult> Get([FromQuery] Get.Parameters parameters)
     {
         var query = _context.Subscriptions.AsQueryable();

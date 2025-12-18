@@ -1,4 +1,8 @@
-﻿namespace Iowa.SubscriptionBySubscriptionPlan.Post;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Provider.SubscriptionByUserIds.Post;
 
 public class Payload
 {
@@ -10,5 +14,5 @@ public class Payload
     public string ChartColor { get; set; } = string.Empty;
     public DateTime PurchasedDate { get; set; }
     public DateTime RenewalDate { get; set; }
-    public bool IsRecusive { get; set; }
+    public bool IsRecursive { get; set; }
 }
