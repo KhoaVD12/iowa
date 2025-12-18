@@ -76,6 +76,7 @@ public class Controller : ControllerBase
         await _tempContext.SubscriptionByUserIds.Where(x => x.UserId == parameters.UserId &&
                                                             x.SubscriptionPlan == parameters.SubscriptionPlan &&
                                                             x.CompanyName == parameters.CompanyName).Delete().ExecuteAsync();
+        await _messageBus.PublishAsync(new Delete.Messager.Message(existingRecord.SubscriptionPlan, existingRecord.CompanyName, existingRecord.UserId));
         return NoContent();
     }
 }
