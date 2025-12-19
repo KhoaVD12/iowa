@@ -67,19 +67,23 @@ public class Controller : ControllerBase
     [HttpPut]
     public async Task<IActionResult> Put([FromBody] Put.Payload payload)
     {
-        Databases.TempDb.Tables.SubscriptionByUserId.Table? existingRecord = await _tempContext.SubscriptionByUserIds.FirstOrDefault(x => x.UserId == payload.UserId &&
-                                                                                               x.SubscriptionPlan == payload.SubscriptionPlan &&
-                                                                                               x.CompanyName == payload.CompanyName).ExecuteAsync();
+        Databases.TempDb.Tables.SubscriptionByUserId.Table? existingRecord = await _tempContext.SubscriptionByUserIds.FirstOrDefault(x => x.UserId == payload.OldUserId &&
+                                                                                               x.SubscriptionPlan == payload.OldSubscriptionPlan &&
+                                                                                               x.CompanyName == payload.OldCompanyName).ExecuteAsync();
         if (existingRecord == null)
         {
             return NotFound();
         }
+        await _tempContext.SubscriptionByUserIds.Where(x => x.UserId == payload.OldUserId &&
+                                                            x.SubscriptionPlan == payload.OldSubscriptionPlan &&
+                                                            x.CompanyName == payload.OldCompanyName).Delete().ExecuteAsync();
+
         var newRecord = new Databases.TempDb.Tables.SubscriptionByUserId.Table
         {
             Id = payload.Id,
-            UserId = payload.UserId,
-            SubscriptionPlan = payload.SubscriptionPlan,
-            CompanyName = payload.CompanyName,
+            UserId = payload.NewUserId,
+            SubscriptionPlan = payload.NewSubscriptionPlan,
+            CompanyName = payload.NewCompanyName,
             Price = payload.Price,
             Currency = payload.Currency,
             ChartColor = payload.ChartColor,
@@ -89,8 +93,8 @@ public class Controller : ControllerBase
         };
 
         await _tempContext.SubscriptionByUserIds.Insert(newRecord).ExecuteAsync();
-        await _messageBus.PublishAsync(new Put.Messager.Message(newRecord.Id, newRecord.UserId, newRecord.SubscriptionPlan, newRecord.CompanyName));
-        return CreatedAtAction(nameof(Get), new { id = newRecord.Id });
+        await _messageBus.PublishAsync(new Put.Messager.Message(newRecord.Id, payload.OldUserId, payload.OldSubscriptionPlan, payload.OldCompanyName, newRecord.UserId, newRecord.SubscriptionPlan, newRecord.CompanyName));
+        return NoContent();
     }
 
     public async Task<IActionResult> Delete([FromQuery] Delete.Parameters parameters)

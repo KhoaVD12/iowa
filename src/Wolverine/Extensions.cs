@@ -23,7 +23,8 @@ public static class Extensions
         options.PublishMessage<Iowa.Providers.Put.Messager.Message>().ToLocalQueue("provider-update");
 
         options.PublishMessage<Iowa.SubscriptionByUserIds.Post.Messager.Message>().ToLocalQueue("subscription-by-user-id-post");
-        options.PublishMessage<Iowa.SubscriptionByUserIds.Post.Messager.Message>().ToLocalQueue("subscription-by-user-id-delete");
+        options.PublishMessage<Iowa.SubscriptionByUserIds.Put.Messager.Message>().ToLocalQueue("subscription-by-user-id-update");
+        options.PublishMessage<Iowa.SubscriptionByUserIds.Delete.Messager.Message>().ToLocalQueue("subscription-by-user-id-delete");
 
     });
 

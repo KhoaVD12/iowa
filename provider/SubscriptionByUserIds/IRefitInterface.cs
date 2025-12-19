@@ -13,7 +13,7 @@ public interface IRefitInterface
     [Post("/api/subscription-by-user-ids")]
     Task<ApiResponse<object>> PostAsync([Body] Post.Payload payload);
 
-    [Post("/api/subscription-by-user-ids")]
+    [Put("/api/subscription-by-user-ids")]
     Task<ApiResponse<object>> PutAsync([Body] Put.Payload payload);
 
     [Delete("/api/subscription-by-user-ids")]
