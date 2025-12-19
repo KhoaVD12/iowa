@@ -9,7 +9,7 @@ public class Handler(TempContext context)
     {
         var userIdBySubscriptionPlan = new Databases.TempDb.Tables.UserIdBySubscriptionPlan.Table
         {
-            Id = Guid.NewGuid(),
+            Id = message.Id,
             UserId = message.UserId,
             SubscriptionPlan = message.SubscriptionPlan,
             CompanyName = message.CompanyName,
