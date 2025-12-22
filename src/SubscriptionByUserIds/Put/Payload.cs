@@ -14,5 +14,7 @@ public class Payload
     public string ChartColor { get; set; } = string.Empty;
     public DateTime PurchasedDate { get; set; }
     public DateTime RenewalDate { get; set; }
-    public bool IsRecusive { get; set; }
+    public bool IsRecursive { get; set; }
+    public int TimesInMonth { get; set; }
+    public bool UseCalendarMonthCycle { get; set; }
 }

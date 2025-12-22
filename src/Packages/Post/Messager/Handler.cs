@@ -30,7 +30,9 @@ public class Handler(TempContext tempContext, IowaContext context)
                         RenewalDate = x.RenewalDate,
                         PurchasedDate = x.PurchasedDate,
                         IsRecursive = x.IsRecursive,
-                        CreatedDate = DateTime.UtcNow,
+                        TimesInMonth = x.TimesInMonth,
+                        UseCalendarMonthCycle = x.UseCalendarMonthCycle,
+                CreatedDate = DateTime.UtcNow,
                         CreatedById = Guid.Empty
                     }).ToList();
 

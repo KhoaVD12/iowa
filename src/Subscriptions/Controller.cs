@@ -58,6 +58,14 @@ public class Controller : ControllerBase
         {
             query = query.Where(x => x.IsRecursive == parameters.IsRecursive);
         }
+        if (parameters.TimesInMonth.HasValue)
+        {
+            query = query.Where(x => x.TimesInMonth == parameters.TimesInMonth.Value);
+        }
+        if (parameters.UseCalendarMonthCycle.HasValue)
+        {
+            query = query.Where(x => x.UseCalendarMonthCycle == parameters.UseCalendarMonthCycle.Value);
+        }
         if (parameters.PageSize.HasValue && parameters.PageIndex.HasValue && parameters.PageSize > 0 && parameters.PageIndex.Value >= 0)
             query = query.Skip(parameters.PageSize.Value * parameters.PageIndex.Value).Take(parameters.PageSize.Value);
 
@@ -102,7 +110,9 @@ public class Controller : ControllerBase
             RenewalDate = payload.RenewalDate,
             CreatedDate = DateTime.UtcNow,
             CreatedById = payload.UserId,
-            IsRecursive = payload.IsRecursive
+            IsRecursive = payload.IsRecursive,
+            TimesInMonth = payload.TimesInMonth,
+            UseCalendarMonthCycle = payload.UseCalendarMonthCycle
         };
         
         _context.Subscriptions.Add(table);
@@ -150,6 +160,8 @@ public class Controller : ControllerBase
         existSubscription.LastUpdated = DateTime.UtcNow;
         existSubscription.UpdatedById = payload.UserId;
         existSubscription.IsRecursive = payload.IsRecursive;
+        existSubscription.TimesInMonth = payload.TimesInMonth;
+        existSubscription.UseCalendarMonthCycle = payload.UseCalendarMonthCycle;
 
         _context.Subscriptions.Update(existSubscription);
         await _context.SaveChangesAsync();

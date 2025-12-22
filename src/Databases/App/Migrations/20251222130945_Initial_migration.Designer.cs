@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Iowa.Databases.App.Migrations
 {
     [DbContext(typeof(IowaContext))]
-    [Migration("20251215145411_IowaApp")]
-    partial class IowaApp
+    [Migration("20251222130945_Initial_migration")]
+    partial class Initial_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -202,8 +202,14 @@ namespace Iowa.Databases.App.Migrations
                     b.Property<DateTime>("RenewalDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("TimesInMonth")
+                        .HasColumnType("int");
+
                     b.Property<Guid?>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("UseCalendarMonthCycle")
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");

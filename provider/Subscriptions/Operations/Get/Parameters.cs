@@ -15,6 +15,8 @@ public class Parameters
     public string? Currency { get; set; }
     public string? ChartColor { get; set; } = string.Empty;
     public bool IsRecursive { get; set; } = false;
+    public int? TimesInMonth { get; set; }
+    public bool? UseCalendarMonthCycle { get; set; }
     public int? PageIndex { get; set; }
     public int? PageSize { get; set; }
 }

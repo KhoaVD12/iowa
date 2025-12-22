@@ -56,7 +56,9 @@ public class Controller : ControllerBase
             ChartColor = payload.ChartColor,
             PurchasedDate = payload.PurchasedDate,
             RenewalDate = payload.RenewalDate,
-            IsRecursive = payload.IsRecusive
+            IsRecursive = payload.IsRecursive,
+            TimesInMonth = payload.TimesInMonth,
+            UseCalendarMonthCycle = payload.UseCalendarMonthCycle
         };
 
         await _tempContext.SubscriptionByUserIds.Insert(newRecord).ExecuteAsync();
@@ -89,7 +91,9 @@ public class Controller : ControllerBase
             ChartColor = payload.ChartColor,
             PurchasedDate = payload.PurchasedDate,
             RenewalDate = payload.RenewalDate,
-            IsRecursive = payload.IsRecusive
+            IsRecursive = payload.IsRecursive,
+            TimesInMonth = payload.TimesInMonth,
+            UseCalendarMonthCycle = payload.UseCalendarMonthCycle
         };
 
         await _tempContext.SubscriptionByUserIds.Insert(newRecord).ExecuteAsync();

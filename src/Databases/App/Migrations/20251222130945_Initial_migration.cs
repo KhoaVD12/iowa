@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Iowa.Databases.App.Migrations
 {
     /// <inheritdoc />
-    public partial class IowaApp : Migration
+    public partial class Initial_migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -80,15 +80,17 @@ namespace Iowa.Databases.App.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PurchasedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PackageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DiscountedPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ChartColor = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DiscountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    PurchasedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RenewalDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsRecursive = table.Column<bool>(type: "bit", nullable: false),
+                    TimesInMonth = table.Column<int>(type: "int", nullable: false),
+                    UseCalendarMonthCycle = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
