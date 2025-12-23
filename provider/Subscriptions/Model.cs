@@ -14,11 +14,8 @@ public class Model
     public string Currency { get; set; } = string.Empty;
     public string ChartColor { get; set; } = string.Empty;
     public Guid? DiscountId { get; set; }
-    public DateTime PurchasedDate { get; set; }
     public DateTime RenewalDate { get; set; }
     public bool IsRecursive { get; set; }
-    public int TimesInMonth { get; set; }
-    public bool UseCalendarMonthCycle { get; set; }
     public DateTime CreatedDate { get; set; }
     public Guid CreatedById { get; set; }
     public DateTime? LastUpdated { get; set; }

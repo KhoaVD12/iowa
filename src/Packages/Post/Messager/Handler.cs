@@ -28,10 +28,7 @@ public class Handler(TempContext tempContext, IowaContext context)
                         Currency = x.Currency,
                         ChartColor = x.ChartColor,
                         RenewalDate = x.RenewalDate,
-                        PurchasedDate = x.PurchasedDate,
                         IsRecursive = x.IsRecursive,
-                        TimesInMonth = x.TimesInMonth,
-                        UseCalendarMonthCycle = x.UseCalendarMonthCycle,
                 CreatedDate = DateTime.UtcNow,
                         CreatedById = Guid.Empty
                     }).ToList();

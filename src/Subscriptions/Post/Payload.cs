@@ -3,7 +3,6 @@
 public class Payload
 {
     public Guid UserId { get; set; }
-    public DateTime PurchasedDate { get; set; }
     public Guid PackageId { get; set; }
     public decimal Price { get; set; }
     public decimal? DiscountedPrice { get; set; }
@@ -12,6 +11,4 @@ public class Payload
     public Guid? DiscountId { get; set; }
     public DateTime RenewalDate { get; set; }
     public bool IsRecursive { get; set; }
-    public int TimesInMonth { get; set; }
-    public bool UseCalendarMonthCycle { get; set; }
 }

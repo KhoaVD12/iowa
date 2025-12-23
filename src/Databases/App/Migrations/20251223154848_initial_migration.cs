@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Iowa.Databases.App.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial_migration : Migration
+    public partial class initial_migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -86,11 +86,8 @@ namespace Iowa.Databases.App.Migrations
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ChartColor = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DiscountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    PurchasedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RenewalDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsRecursive = table.Column<bool>(type: "bit", nullable: false),
-                    TimesInMonth = table.Column<int>(type: "int", nullable: false),
-                    UseCalendarMonthCycle = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),

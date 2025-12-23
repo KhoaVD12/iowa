@@ -55,7 +55,6 @@ public class Test
         {
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
-            PurchasedDate = DateTime.UtcNow,
             PackageId = package.Id,
             Price = 9.99m,
             DiscountedPrice = null,
@@ -95,7 +94,6 @@ public class Test
         {
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
-            PurchasedDate = DateTime.UtcNow,
             PackageId = Guid.NewGuid(),
             Price = 9.99m,
             DiscountedPrice = null,
@@ -152,7 +150,6 @@ public class Test
         var subscription = new Provider.Subscriptions.Post.Payload
         {
             UserId = Guid.NewGuid(),
-            PurchasedDate= DateTime.UtcNow,
             PackageId = package.Id,
             Price = 9.99m,
             Currency = "USD",
@@ -212,7 +209,6 @@ public class Test
         {
             Id = subscriptionId,
             UserId = oldUserId,
-            PurchasedDate = DateTime.UtcNow,
             PackageId = package.Id,
             Price = 9.99m,
             DiscountedPrice = null,
@@ -261,7 +257,6 @@ public class Test
         {
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
-            PurchasedDate = DateTime.UtcNow,
             PackageId = Guid.NewGuid(),
             Price = 9.99m,
             DiscountedPrice = null,
