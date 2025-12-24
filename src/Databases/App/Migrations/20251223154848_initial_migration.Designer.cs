@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Iowa.Databases.App.Migrations
 {
     [DbContext(typeof(IowaContext))]
-    [Migration("20251215145411_IowaApp")]
-    partial class IowaApp
+    [Migration("20251223154848_initial_migration")]
+    partial class initial_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -195,9 +195,6 @@ namespace Iowa.Databases.App.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("PurchasedDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("RenewalDate")
                         .HasColumnType("datetime2");

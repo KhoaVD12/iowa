@@ -28,9 +28,8 @@ public class Handler(TempContext tempContext, IowaContext context)
                         Currency = x.Currency,
                         ChartColor = x.ChartColor,
                         RenewalDate = x.RenewalDate,
-                        PurchasedDate = x.PurchasedDate,
                         IsRecursive = x.IsRecursive,
-                        CreatedDate = DateTime.UtcNow,
+                CreatedDate = DateTime.UtcNow,
                         CreatedById = Guid.Empty
                     }).ToList();
 

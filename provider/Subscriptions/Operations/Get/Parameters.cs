@@ -8,7 +8,6 @@ public class Parameters
 {
     public Guid? Id { get; set; }
     public Guid? UserId { get; set; }
-    public DateTime? PurchasedDate { get; set; }
     public Guid? PackageId { get; set; }
     public decimal? Price { get; set; }
     public decimal? DiscountedPrice { get; set; }

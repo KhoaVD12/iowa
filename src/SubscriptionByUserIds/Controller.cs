@@ -54,9 +54,8 @@ public class Controller : ControllerBase
             Price = payload.Price,
             Currency = payload.Currency,
             ChartColor = payload.ChartColor,
-            PurchasedDate = payload.PurchasedDate,
             RenewalDate = payload.RenewalDate,
-            IsRecursive = payload.IsRecusive
+            IsRecursive = payload.IsRecursive,
         };
 
         await _tempContext.SubscriptionByUserIds.Insert(newRecord).ExecuteAsync();
@@ -87,9 +86,8 @@ public class Controller : ControllerBase
             Price = payload.Price,
             Currency = payload.Currency,
             ChartColor = payload.ChartColor,
-            PurchasedDate = payload.PurchasedDate,
             RenewalDate = payload.RenewalDate,
-            IsRecursive = payload.IsRecusive
+            IsRecursive = payload.IsRecursive,
         };
 
         await _tempContext.SubscriptionByUserIds.Insert(newRecord).ExecuteAsync();

@@ -38,10 +38,6 @@ public class Controller : ControllerBase
         {
             query = query.Where(x => x.UserId == parameters.UserId.Value);
         }
-        if (parameters.PurchasedDate.HasValue)
-        {
-            query = query.Where(x => x.PurchasedDate.Date == parameters.PurchasedDate.Value.Date);
-        }
         if (parameters.PackageId.HasValue)
         {
             query = query.Where(x => x.PackageId == parameters.PackageId.Value);
@@ -92,7 +88,6 @@ public class Controller : ControllerBase
         {
             Id = Guid.NewGuid(),
             UserId = payload.UserId,
-            PurchasedDate = payload.PurchasedDate,
             PackageId = payload.PackageId,
             Price = payload.Price,
             DiscountedPrice = payload.DiscountedPrice,
@@ -102,7 +97,7 @@ public class Controller : ControllerBase
             RenewalDate = payload.RenewalDate,
             CreatedDate = DateTime.UtcNow,
             CreatedById = payload.UserId,
-            IsRecursive = payload.IsRecursive
+            IsRecursive = payload.IsRecursive,
         };
         
         _context.Subscriptions.Add(table);
@@ -139,7 +134,6 @@ public class Controller : ControllerBase
         }
 
         existSubscription.UserId = payload.UserId;
-        existSubscription.PurchasedDate = payload.PurchasedDate;
         existSubscription.PackageId = payload.PackageId;
         existSubscription.Price =  payload.Price;
         existSubscription.DiscountedPrice = payload.DiscountedPrice;
