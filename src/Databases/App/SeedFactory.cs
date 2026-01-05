@@ -13,11 +13,12 @@ public class SeedFactory
             return;
         }
 
-        // Lấy đường dẫn từ thư mục gốc của solution
-        var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        var projectRoot = Path.GetFullPath(Path.Combine(baseDirectory, @"..\..\..\..\.."));
-        var filePath = Path.Combine(projectRoot, "iowa", "src", "Databases", "App", "Tables", "Provider", "Providers.xlsx");
+        //// Lấy đường dẫn từ thư mục gốc của solution
+        //var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        //var projectRoot = Path.GetFullPath(Path.Combine(baseDirectory, @"..\..\..\..\.."));
+        //var filePath = Path.Combine(projectRoot, "iowa", "src", "Databases", "App", "Tables", "Provider", "Providers.xlsx");
 
+        var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Databases/App/Tables/Provider/Providers.xlsx");
         Console.WriteLine($"Looking for file at: {filePath}");
         Console.WriteLine($"File exists: {File.Exists(filePath)}");
 
@@ -110,9 +111,10 @@ public class SeedFactory
         }
 
         // Lấy đường dẫn từ thư mục gốc của solution
-        var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        var projectRoot = Path.GetFullPath(Path.Combine(baseDirectory, @"..\..\..\..\.."));
-        var filePath = Path.Combine(projectRoot, "iowa", "src", "Databases", "App", "Tables", "Package", "Packages.xlsx");
+        //var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        //var projectRoot = Path.GetFullPath(Path.Combine(baseDirectory, @"..\..\..\..\.."));
+        //var filePath = Path.Combine(projectRoot, "iowa", "src", "Databases", "App", "Tables", "Package", "Packages.xlsx");
+        var filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Databases/App/Tables/Package/Packages.xlsx");
 
         Console.WriteLine($"Looking for file at: {filePath}");
         Console.WriteLine($"File exists: {File.Exists(filePath)}");

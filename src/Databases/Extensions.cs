@@ -66,7 +66,7 @@ namespace Iowa.Databases
                 .WithDatabase(iowaDbConfig.Database)
                 .WithUsername(iowaDbConfig.Username)
                 .WithPassword(iowaDbConfig.Password)
-                .WithTrustedConnection()
+                //.WithTrustedConnection()
                 .WithTrustServerCertificate()
                 .Build();
 
@@ -76,7 +76,7 @@ namespace Iowa.Databases
                 .WithDatabase(identityDbConfig.Database)
                 .WithUsername(identityDbConfig.Username)
                 .WithPassword(identityDbConfig.Password)
-                .WithTrustedConnection()
+                //.WithTrustedConnection()
                 .WithTrustServerCertificate()
                 .Build();
 
