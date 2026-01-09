@@ -1,11 +1,11 @@
-# Iowa Application Helm Chart Values
-# Optimized for worker nodes with 4CPU/4GB RAM
+# helm upgrade -i viet-iowa ./ -n viet-iowa
 
+# Iowa Application Helm Chart Values
 # Iowa application configuration
 replicaCount: 1
 
 image:
-  repository: coolserver/iowa  # Update this to your registry
+  repository: docker.io/nhatsangvn/viet-iowa  # Update this to your registry
   tag: latest
   pullPolicy: IfNotPresent
 
@@ -46,17 +46,17 @@ ingress:
   enabled: true
   className: "nginx"
   annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts:
-    - host: iowa.example.com  # CHANGE THIS!
+    - host: iowa.cmt8.sohan.cloud
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: iowa-tls
       hosts:
-        - iowa.example.com  # CHANGE THIS!
+        - iowa.cmt8.sohan.cloud
 
 # Resource limits - optimized for 4CPU/4GB nodes (minimal homelab)
 resources:
@@ -67,24 +67,24 @@ resources:
     cpu: 200m
     memory: 256Mi
 
-# Liveness and readiness probes
-livenessProbe:
-  httpGet:
-    path: /health
-    port: http
-  initialDelaySeconds: 30
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 3
+# # Liveness and readiness probes
+# livenessProbe:
+#   httpGet:
+#     path: /health
+#     port: http
+#   initialDelaySeconds: 30
+#   periodSeconds: 10
+#   timeoutSeconds: 5
+#   failureThreshold: 3
 
-readinessProbe:
-  httpGet:
-    path: /health
-    port: http
-  initialDelaySeconds: 15
-  periodSeconds: 5
-  timeoutSeconds: 3
-  failureThreshold: 3
+# readinessProbe:
+#   httpGet:
+#     path: /health
+#     port: http
+#   initialDelaySeconds: 15
+#   periodSeconds: 5
+#   timeoutSeconds: 3
+#   failureThreshold: 3
 
 # Autoscaling (disabled by default for resource-constrained environments)
 autoscaling:
@@ -116,7 +116,7 @@ config:
 
   # Machine Auth
   machineAuth:
-    secretKey: "secretKey"  # CHANGE THIS IN PRODUCTION!
+    secretKey: "secretKey"
 
   # Cassandra Database Configuration
   cassandraDb:
@@ -131,7 +131,7 @@ config:
     port: "1433"
     database: "ssto-database"
     username: "sa"
-    password: "SqlServer2022!"  # CHANGE THIS IN PRODUCTION!
+    password: "SqlServer2022!"
 
   # SQL Server - IdentityDb Configuration
   identityDb:
@@ -139,7 +139,7 @@ config:
     port: "1433"
     database: "ssto-database"
     username: "sa"
-    password: "SqlServer2022!"  # CHANGE THIS IN PRODUCTION!
+    password: "SqlServer2022!"
 
 # SQL Server subchart configuration
 mssql:
@@ -147,14 +147,14 @@ mssql:
   config:
     acceptEula: "Y"
     edition: Developer
-    saPassword: "SqlServer2022!"  # CHANGE THIS IN PRODUCTION!
+    saPassword: "SqlServer2022!"
   persistence:
     enabled: true
     size: 5Gi
   resources:
     limits:
       cpu: 500m
-      memory: 1.5Gi
+      memory: 2Gi
     requests:
       cpu: 250m
       memory: 1Gi
