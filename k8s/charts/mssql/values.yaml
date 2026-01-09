@@ -27,7 +27,7 @@ config:
 # Persistence configuration
 persistence:
   enabled: true
-  storageClass: ""  # Use default storage class
+  storageClass: ""  # Use local-path for local clusters, or "" for default
   accessMode: ReadWriteOnce
   size: 5Gi
 

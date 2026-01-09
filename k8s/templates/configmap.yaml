@@ -23,20 +23,20 @@ data:
         "SecretKey": {{ .Values.config.machineAuth.secretKey | quote }}
       },
       "CassandraDb": {
-        "ContactPoint": {{ .Values.config.cassandraDb.contactPoint | quote }},
+        "ContactPoint": "{{ .Release.Name }}-cassandra",
         "Port": {{ .Values.config.cassandraDb.port | quote }},
         "Keyspace": {{ .Values.config.cassandraDb.keyspace | quote }},
         "DataCenter": {{ .Values.config.cassandraDb.dataCenter | quote }}
       },
       "IowaDb": {
-        "Host": {{ .Values.config.iowaDb.host | quote }},
+        "Host": "{{ .Release.Name }}-mssql",
         "Port": {{ .Values.config.iowaDb.port | quote }},
         "Database": {{ .Values.config.iowaDb.database | quote }},
         "Username": {{ .Values.config.iowaDb.username | quote }},
         "Password": {{ .Values.config.iowaDb.password | quote }}
       },
       "IdentityDb": {
-        "Host": {{ .Values.config.identityDb.host | quote }},
+        "Host": "{{ .Release.Name }}-mssql",
         "Port": {{ .Values.config.identityDb.port | quote }},
         "Database": {{ .Values.config.identityDb.database | quote }},
         "Username": {{ .Values.config.identityDb.username | quote }},
