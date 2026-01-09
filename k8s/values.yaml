@@ -58,14 +58,14 @@ ingress:
       hosts:
         - iowa.example.com  # CHANGE THIS!
 
-# Resource limits - optimized for 4CPU/4GB nodes
+# Resource limits - optimized for 4CPU/4GB nodes (minimal homelab)
 resources:
   limits:
-    cpu: 1000m
-    memory: 1Gi
-  requests:
     cpu: 500m
     memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
 
 # Liveness and readiness probes
 livenessProbe:
@@ -153,24 +153,29 @@ mssql:
     size: 5Gi
   resources:
     limits:
-      cpu: 1000m
-      memory: 2Gi
-    requests:
       cpu: 500m
+      memory: 1.5Gi
+    requests:
+      cpu: 250m
       memory: 1Gi
 
 # Cassandra configuration (Bitnami chart)
 cassandra:
   enabled: true
 
-  # Resource optimization for 4CPU/4GB nodes
+  # Use bitnamilegacy registry (bitnami registry deprecated as of Aug 2025)
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/cassandra
+
+  # Resource optimization for 4CPU/4GB nodes (minimal homelab)
   resources:
     limits:
-      cpu: 1000m
-      memory: 1.5Gi
-    requests:
-      cpu: 500m
+      cpu: 750m
       memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 768Mi
 
   # Database configuration
   dbUser:
