@@ -168,6 +168,11 @@ cassandra:
     registry: docker.io
     repository: bitnamilegacy/cassandra
 
+  # Allow non-standard container images (required for bitnamilegacy)
+  global:
+    security:
+      allowInsecureImages: true
+
   # Resource optimization for 4CPU/4GB nodes (minimal homelab)
   resources:
     limits:
