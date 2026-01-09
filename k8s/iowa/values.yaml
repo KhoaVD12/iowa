@@ -1,0 +1,203 @@
+# Iowa Application Helm Chart Values
+# Optimized for worker nodes with 4CPU/4GB RAM
+
+# Iowa application configuration
+replicaCount: 1
+
+image:
+  repository: coolserver/iowa  # Update this to your registry
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod annotations
+podAnnotations: {}
+
+# Pod security context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+# Container security context
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: iowa.example.com  # CHANGE THIS!
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: iowa-tls
+      hosts:
+        - iowa.example.com  # CHANGE THIS!
+
+# Resource limits - optimized for 4CPU/4GB nodes
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Liveness and readiness probes
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Autoscaling (disabled by default for resource-constrained environments)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}
+
+# Application configuration
+config:
+  aspnetcoreEnvironment: Docker
+  aspnetcoreUrls: "http://+:80"
+
+  # JWT Configuration
+  jwt:
+    issuer: "AuthIowaIssuer"
+    audience: "AuthIowaClient"
+    key: "f1f02a950f8873d381d7f46119cd851dc9bf061be7c3e5a0cacff81700a2e4c8e0c213883d8f732c528dd5a955dd70a591fb3b7b21c1270bba935e3fbfe0db34"
+
+  # Machine Auth
+  machineAuth:
+    secretKey: "secretKey"  # CHANGE THIS IN PRODUCTION!
+
+  # Cassandra Database Configuration
+  cassandraDb:
+    contactPoint: "iowa-cassandra"  # Will be set to the Cassandra service name
+    port: "9042"
+    keyspace: "subscriptions"
+    dataCenter: "datacenter1"
+
+  # SQL Server - IowaDb Configuration
+  iowaDb:
+    host: "iowa-mssql"  # Will be set to the SQL Server service name
+    port: "1433"
+    database: "ssto-database"
+    username: "sa"
+    password: "SqlServer2022!"  # CHANGE THIS IN PRODUCTION!
+
+  # SQL Server - IdentityDb Configuration
+  identityDb:
+    host: "iowa-mssql"  # Will be set to the SQL Server service name
+    port: "1433"
+    database: "ssto-database"
+    username: "sa"
+    password: "SqlServer2022!"  # CHANGE THIS IN PRODUCTION!
+
+# SQL Server subchart configuration
+mssql:
+  enabled: true
+  config:
+    acceptEula: "Y"
+    edition: Developer
+    saPassword: "SqlServer2022!"  # CHANGE THIS IN PRODUCTION!
+  persistence:
+    enabled: true
+    size: 5Gi
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+# Cassandra configuration (Bitnami chart)
+cassandra:
+  enabled: true
+
+  # Resource optimization for 4CPU/4GB nodes
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1.5Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+
+  # Database configuration
+  dbUser:
+    user: cassandra
+    password: cassandra  # CHANGE THIS IN PRODUCTION!
+
+  cluster:
+    name: TestCluster
+    datacenter: datacenter1
+    rack: rack1
+    seedCount: 1
+    numTokens: 256
+
+  # Persistence configuration
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 5Gi
+
+  # Single node for resource-constrained environments
+  replicaCount: 1
+
+  # Service configuration - ClusterIP for internal access only
+  service:
+    type: ClusterIP
+    ports:
+      cql: 9042
+
+  # Initialize keyspace on startup
+  initDBConfigMap: iowa-cassandra-init

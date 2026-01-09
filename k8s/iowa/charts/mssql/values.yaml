@@ -1,0 +1,42 @@
+# SQL Server 2022 configuration
+# Optimized for 4CPU/4GB worker nodes
+
+enabled: true
+
+image:
+  repository: mcr.microsoft.com/mssql/server
+  tag: 2022-latest
+  pullPolicy: IfNotPresent
+
+# Resource limits optimized for constrained environments
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 1Gi
+
+# SQL Server configuration
+config:
+  acceptEula: "Y"
+  edition: Developer  # Use Developer edition for non-production
+  saPassword: "SqlServer2022!"  # CHANGE THIS IN PRODUCTION!
+  hostname: sqlserver
+
+# Persistence configuration
+persistence:
+  enabled: true
+  storageClass: ""  # Use default storage class
+  accessMode: ReadWriteOnce
+  size: 5Gi
+
+# Service configuration - ClusterIP for internal access only
+service:
+  type: ClusterIP
+  port: 1433
+
+# Security context
+securityContext:
+  runAsUser: 0  # SQL Server requires root
+  fsGroup: 10001

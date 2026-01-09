@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "iowa.fullname" . }}
+  labels:
+    {{- include "iowa.labels" . | nindent 4 }}
+data:
+  appsettings.Docker.json: |
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Information",
+          "Microsoft.AspNetCore": "Warning"
+        }
+      },
+      "AllowedHosts": "*",
+      "Jwt": {
+        "Issuer": {{ .Values.config.jwt.issuer | quote }},
+        "Audience": {{ .Values.config.jwt.audience | quote }},
+        "Key": {{ .Values.config.jwt.key | quote }}
+      },
+      "MachineAuth": {
+        "SecretKey": {{ .Values.config.machineAuth.secretKey | quote }}
+      },
+      "CassandraDb": {
+        "ContactPoint": {{ .Values.config.cassandraDb.contactPoint | quote }},
+        "Port": {{ .Values.config.cassandraDb.port | quote }},
+        "Keyspace": {{ .Values.config.cassandraDb.keyspace | quote }},
+        "DataCenter": {{ .Values.config.cassandraDb.dataCenter | quote }}
+      },
+      "IowaDb": {
+        "Host": {{ .Values.config.iowaDb.host | quote }},
+        "Port": {{ .Values.config.iowaDb.port | quote }},
+        "Database": {{ .Values.config.iowaDb.database | quote }},
+        "Username": {{ .Values.config.iowaDb.username | quote }},
+        "Password": {{ .Values.config.iowaDb.password | quote }}
+      },
+      "IdentityDb": {
+        "Host": {{ .Values.config.identityDb.host | quote }},
+        "Port": {{ .Values.config.identityDb.port | quote }},
+        "Database": {{ .Values.config.identityDb.database | quote }},
+        "Username": {{ .Values.config.identityDb.username | quote }},
+        "Password": {{ .Values.config.identityDb.password | quote }}
+      }
+    }
+---
+{{- if .Values.cassandra.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: iowa-cassandra-init
+  labels:
+    {{- include "iowa.labels" . | nindent 4 }}
+data:
+  init.cql: |
+    -- Create keyspace if it doesn't exist
+    CREATE KEYSPACE IF NOT EXISTS subscriptions
+    WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+
+    -- Use the keyspace
+    USE subscriptions;
+
+    -- Add your table creation scripts here
+    -- Example:
+    -- CREATE TABLE IF NOT EXISTS subscription_by_user_id (
+    --   user_id UUID,
+    --   subscription_id UUID,
+    --   PRIMARY KEY (user_id, subscription_id)
+    -- );
+{{- end }}
