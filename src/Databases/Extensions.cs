@@ -11,8 +11,9 @@ namespace Iowa.Databases
         public static IServiceCollection AddDatabases(this IServiceCollection services, IConfiguration configuration)
         {
             #region Cassandra
+            int attempts = 0;
             var cassandraDbConfig = configuration.GetSection("CassandraDb").Get<TempDb.Config>();
-            if (cassandraDbConfig != null)
+            while (attempts < 5)
             {
                 try
                 {
@@ -36,17 +37,52 @@ namespace Iowa.Databases
                     services.AddSingleton<TempDb.TempContext>();
                     services.AddSingleton(session);
 
-                    Console.WriteLine("✅ Cassandra connected");
-                }
-                catch (Cassandra.NoHostAvailableException)
-                {
-                    Console.WriteLine("⚠️ Cassandra not available, skipping...");
+                    Console.WriteLine("Cassandra connected!!");
+                    break;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"⚠️ Cassandra error: {ex.Message}, skipping...");
+                    attempts++;
+                    Console.WriteLine($"⚠️ Cassandra connection attempt {attempts} failed due to: {ex.Message}");
                 }
             }
+
+
+            //if (cassandraDbConfig != null)
+            //{
+            //    try
+            //    {
+            //        var cluster = Cluster.Builder()
+            //            .AddContactPoint(cassandraDbConfig.ContactPoint)
+            //            .WithPort(cassandraDbConfig.Port)
+            //            .WithLoadBalancingPolicy(new DCAwareRoundRobinPolicy(cassandraDbConfig.DataCenter))
+            //            .Build();
+
+            //        // Nếu chưa có keyspace, có thể Connect() không tham số trước
+            //        Cassandra.ISession session;
+            //        if (!string.IsNullOrEmpty(cassandraDbConfig.Keyspace))
+            //        {
+            //            session = cluster.Connect(cassandraDbConfig.Keyspace);
+            //        }
+            //        else
+            //        {
+            //            session = cluster.Connect();
+            //        }
+
+            //        services.AddSingleton<TempDb.TempContext>();
+            //        services.AddSingleton(session);
+
+            //        Console.WriteLine("✅ Cassandra connected");
+            //    }
+            //    catch (Cassandra.NoHostAvailableException)
+            //    {
+            //        Console.WriteLine("⚠️ Cassandra not available, skipping...");
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Console.WriteLine($"⚠️ Cassandra error: {ex.Message}, skipping...");
+            //    }
+            //}
             #endregion
 
             var iowaDbConfig = configuration.GetSection("IowaDb").Get<Sql.DbConfig>();
