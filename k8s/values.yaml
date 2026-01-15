@@ -127,7 +127,7 @@ config:
 
   # SQL Server - IowaDb Configuration
   iowaDb:
-    host: "iowa-mssql"  # Will be set to the SQL Server service name
+    host: "viet-iowa-sqlserver"  # Will be set to the SQL Server service name
     port: "1433"
     database: "ssto-database"
     username: "sa"
@@ -135,26 +135,39 @@ config:
 
   # SQL Server - IdentityDb Configuration
   identityDb:
-    host: "iowa-mssql"  # Will be set to the SQL Server service name
+    host: "viet-iowa-sqlserver"  # Will be set to the SQL Server service name
     port: "1433"
     database: "ssto-database"
     username: "sa"
     password: "SqlServer2022!"
 
-# SQL Server subchart configuration
-mssql:
+# SQL Server configuration (custom templates)
+sqlserver:
   enabled: true
-  config:
-    acceptEula: "Y"
-    edition: Developer
+  image:
+    repository: mcr.microsoft.com/mssql/server
+    tag: "2022-latest"
+    pullPolicy: IfNotPresent
+  acceptEula: "Y"
+  edition: Developer
+  auth:
     saPassword: "SqlServer2022!"
+  service:
+    type: ClusterIP
+    port: 1433
   persistence:
     enabled: true
+    storageClass: ""
     size: 5Gi
+    mountPath: /var/opt/mssql
+  securityContext:
+    fsGroup: 10001
+    runAsUser: 10001
+    runAsNonRoot: true
   resources:
     limits:
-      cpu: 500m
-      memory: 1Gi
+      cpu: 1000m
+      memory: 1.5Gi
     requests:
       cpu: 250m
       memory: 0.5Gi

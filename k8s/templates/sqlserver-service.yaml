@@ -1,0 +1,19 @@
+{{- if .Values.sqlserver.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "iowa.fullname" . }}-sqlserver
+  labels:
+    {{- include "iowa.labels" . | nindent 4 }}
+    app.kubernetes.io/component: sqlserver
+spec:
+  type: {{ .Values.sqlserver.service.type }}
+  ports:
+    - port: {{ .Values.sqlserver.service.port }}
+      targetPort: mssql
+      protocol: TCP
+      name: mssql
+  selector:
+    {{- include "iowa.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: sqlserver
+{{- end }}
