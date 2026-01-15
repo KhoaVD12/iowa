@@ -24,8 +24,8 @@ Iowa application has been deployed!
 {{- end }}
 
 2. Database Information:
-{{- if .Values.mssql.enabled }}
-   - SQL Server: {{ .Release.Name }}-mssql:1433
+{{- if .Values.sqlserver.enabled }}
+   - SQL Server: {{ include "iowa.fullname" . }}-sqlserver:1433
      - IowaDb database: {{ .Values.config.iowaDb.database }}
      - IdentityDb database: {{ .Values.config.identityDb.database }}
 {{- end }}
