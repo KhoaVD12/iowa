@@ -1,4 +1,4 @@
-# helm upgrade -i viet-iowa ./ -n viet-iowa
+# helm upgrade -i viet-iowa ./ -n viet-iowa -f values.yaml
 
 # Iowa Application Helm Chart Values
 # Iowa application configuration
@@ -47,16 +47,16 @@ ingress:
   className: "nginx"
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-staging"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
   hosts:
-    - host: iowa.cmt8.sohan.cloud
+    - host: viet-iowa.cmt8.sohan.cloud
       paths:
         - path: /
           pathType: Prefix
   tls:
     - secretName: iowa-tls
       hosts:
-        - iowa.cmt8.sohan.cloud
+        - viet-iowa.cmt8.sohan.cloud
 
 # Resource limits - optimized for 4CPU/4GB nodes (minimal homelab)
 resources:
@@ -154,10 +154,10 @@ mssql:
   resources:
     limits:
       cpu: 500m
-      memory: 2Gi
+      memory: 1Gi
     requests:
       cpu: 250m
-      memory: 1Gi
+      memory: 0.5Gi
 
 # Cassandra configuration (Bitnami chart)
 cassandra:
