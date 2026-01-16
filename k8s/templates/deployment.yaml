@@ -45,7 +45,7 @@ spec:
               value: {{ .Values.config.aspnetcoreUrls | quote }}
           volumeMounts:
             - name: config
-              mountPath: /app/appsettings.Docker.json
+              mountPath: /app/appsettings.json
               subPath: appsettings.Docker.json
           {{- if .Values.livenessProbe }}
           livenessProbe:
