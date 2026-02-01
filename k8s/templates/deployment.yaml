@@ -46,7 +46,7 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /app/appsettings.json
-              subPath: appsettings.Docker.json
+              subPath: appsettings.k8s.json
           {{- if .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}

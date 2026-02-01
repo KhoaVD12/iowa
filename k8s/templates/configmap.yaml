@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "iowa.labels" . | nindent 4 }}
 data:
-  appsettings.Docker.json: |
+  appsettings.k8s.json: |
     {
       "Logging": {
         "LogLevel": {
@@ -23,20 +23,20 @@ data:
         "SecretKey": {{ .Values.config.machineAuth.secretKey | quote }}
       },
       "CassandraDb": {
-        "ContactPoint": "{{ .Release.Name }}-cassandra",
+        "ContactPoint": "{{ .Release.Name }}-cassandra.{{ .Release.Namespace }}.svc.cluster.local",
         "Port": {{ .Values.config.cassandraDb.port | quote }},
         "Keyspace": {{ .Values.config.cassandraDb.keyspace | quote }},
         "DataCenter": {{ .Values.config.cassandraDb.dataCenter | quote }}
       },
       "IowaDb": {
-        "Host": "{{ .Release.Name }}-mssql",
+        "Host": "{{ .Release.Name }}-sqlserver.{{ .Release.Namespace }}.svc.cluster.local",
         "Port": {{ .Values.config.iowaDb.port | quote }},
         "Database": {{ .Values.config.iowaDb.database | quote }},
         "Username": {{ .Values.config.iowaDb.username | quote }},
         "Password": {{ .Values.config.iowaDb.password | quote }}
       },
       "IdentityDb": {
-        "Host": "{{ .Release.Name }}-mssql",
+        "Host": "{{ .Release.Name }}-sqlserver.{{ .Release.Namespace }}.svc.cluster.local",
         "Port": {{ .Values.config.identityDb.port | quote }},
         "Database": {{ .Values.config.identityDb.database | quote }},
         "Username": {{ .Values.config.identityDb.username | quote }},
