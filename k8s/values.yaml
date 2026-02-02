@@ -1,3 +1,4 @@
+# helm diff upgrade viet-iowa ./ -n viet-iowa -f values.yaml --three-way-merge
 # helm upgrade -i viet-iowa ./ -n viet-iowa -f values.yaml
 
 # Iowa Application Helm Chart Values
@@ -5,8 +6,8 @@
 replicaCount: 1
 
 image:
-  repository: docker.io/nhatsangvn/viet-iowa  # Update this to your registry
-  tag: latest
+  repository: docker.io/thienngo03/iowa  # Update this to your registry
+  tag: 1.1
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
