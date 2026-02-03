@@ -213,6 +213,8 @@ cassandra:
     enabled: true
     storageClass: ""
     size: 5Gi
+    annotations:
+      helm.sh/resource-policy: keep
 
   # Single node for resource-constrained environments
   replicaCount: 1
