@@ -95,6 +95,7 @@ public class Controller : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete]
     public async Task<IActionResult> Delete([FromQuery] Delete.Parameters parameters)
     {
         Databases.TempDb.Tables.SubscriptionByUserId.Table? existingRecord = await _tempContext.SubscriptionByUserIds.FirstOrDefault(x => x.UserId == parameters.UserId &&
