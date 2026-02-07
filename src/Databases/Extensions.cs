@@ -3,6 +3,7 @@ using Iowa.Databases.App;
 using Iowa.Databases.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Iowa.Databases
 {
@@ -17,13 +18,20 @@ namespace Iowa.Databases
             {
                 try
                 {
-                    var cluster = Cluster.Builder()
+                    var builder = Cluster.Builder()
                         .AddContactPoint(cassandraDbConfig.ContactPoint)
                         .WithPort(cassandraDbConfig.Port)
-                        .WithLoadBalancingPolicy(new DCAwareRoundRobinPolicy(cassandraDbConfig.DataCenter))
-                        .Build();
+                        .WithLoadBalancingPolicy(new DCAwareRoundRobinPolicy(cassandraDbConfig.DataCenter));
 
-                    // Nếu chưa có keyspace, có thể Connect() không tham số trước
+                    // Nếu có username/password thì thêm vào
+                    if (!string.IsNullOrEmpty(cassandraDbConfig.Username) &&
+                        !string.IsNullOrEmpty(cassandraDbConfig.Password))
+                    {
+                        builder = builder.WithCredentials(cassandraDbConfig.Username, cassandraDbConfig.Password);
+                    }
+
+                    var cluster = builder.Build();
+
                     Cassandra.ISession session;
                     if (!string.IsNullOrEmpty(cassandraDbConfig.Keyspace))
                     {
@@ -34,8 +42,13 @@ namespace Iowa.Databases
                         session = cluster.Connect();
                     }
 
-                    services.AddSingleton<TempDb.TempContext>();
-                    services.AddSingleton(session);
+                    services.AddSingleton<Cassandra.ISession>(session);
+
+                    services.AddSingleton<TempDb.TempContext>(provider =>
+                    {
+                        var s = provider.GetRequiredService<Cassandra.ISession>();
+                        return new TempDb.TempContext(s);
+                    });
 
                     Console.WriteLine("Cassandra connected!!");
                     break;

@@ -6,4 +6,6 @@ public class Config
     public int Port { get; set; }
     public string Keyspace { get; set; } = string.Empty;
     public string DataCenter { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }
